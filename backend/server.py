@@ -1,6 +1,6 @@
 from flask import Flask
-from sheets_get_values import get_sheet_values
 from flask_cors import CORS
+from sheets_get_values import get_sheet_values
 
 app = Flask(__name__)
 CORS(app)
