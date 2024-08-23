@@ -1,10 +1,30 @@
 # morgan-stanley-code-for-good-team-10
 
-## Setup Instructions
+## Frontend Instructions
+
+### 1. Navigate to frontend folder
+
+In VSCode, open a new terminal. Then, run the following command to navigate to the frontend folder:
+
+```cd frontend```
+
+### 2. Install Node.js packages
+
+If this is your first time opneing this project, run the following command to install node packages. Otherwise, skip this step:
+
+```npm install``` or ```npm i```
+
+### 3. Running the server
+
+Run the following command:
+
+```npm start``` or ```npm run start```
+
+## Backend Instructions
 
 ### 1. Navigate to backend folder
 
-In VSCode, open a new terminal. Then, run the following command to navigate to the backend folder:
+In VSCode, open a new split terminal. Then, run the following command to navigate to the backend folder:
 
 ```cd backend```
 
