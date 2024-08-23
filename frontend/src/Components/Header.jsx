@@ -4,8 +4,7 @@ import UnknownImageAvatar from '../Assets/UnknownImageAvatar.jpeg';
 function Header() {
   const [activeLink, setActiveLink] = useState('');
 
-  const handleClick = (event, link) => {
-    event.preventDefault(); 
+  const handleClick = (link) => {
     setActiveLink(link);
   };
 
@@ -29,7 +28,7 @@ return (
                     <a
                         href="/events"
                         className={`px-4 py-2 rounded-md text-2xl ${activeLink === '/events' ? 'text-red' : 'text-darkgrey'} hover:text-blue transition duration-150 ease-in-out`}
-                        onClick={(e) => handleClick(e, '/events')}
+                        onClick={() => handleClick('/events')}
                     >
                         Events
                     </a>
@@ -38,7 +37,7 @@ return (
                     <a
                         href="/dashboard"
                         className={`px-4 py-2 rounded-md text-2xl ${activeLink === '/dashboard' ? 'text-red' : 'text-darkgrey'} hover:text-blue transition duration-150 ease-in-out`}
-                        onClick={(e) => handleClick(e, '/dashboard')}
+                        onClick={() => handleClick('/dashboard')}
                     >
                         Dashboard
                     </a>
@@ -47,7 +46,7 @@ return (
                     <a
                         href="/admin"
                         className={`px-4 py-2 rounded-md text-2xl ${activeLink === '/admin' ? 'text-red' : 'text-darkgrey'} hover:text-blue transition duration-150 ease-in-out`}
-                        onClick={(e) => handleClick(e, '/admin')}
+                        onClick={() => handleClick('/admin')}
                     >
                         Admin
                     </a>
@@ -56,7 +55,7 @@ return (
                     <a
                         href="/profile"
                         className={`px-4 py-2 rounded-md flex items-center justify-center ${activeLink === '/profile' ? 'text-red' : 'text-white'} hover:text-customBlue transition duration-150 ease-in-out`}
-                        onnClick={(e) => handleClick(e, '/profile')}   
+                        onClick={() => handleClick('/profile')}   
                     >
                         <img
                             src={UnknownImageAvatar}
