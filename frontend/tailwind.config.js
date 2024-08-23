@@ -10,6 +10,11 @@ module.exports = {
       fontFamily: {
         sans: ['Open Sans', 'sans-serif'],
       },
+      fontWeight: {
+        normal: '400',
+        medium: '500',
+        bold: '700',
+      },
       backgroundColor: {
         'dark-blue': '#000957',
         'dark-blue-hover': '#03139e',
@@ -26,7 +31,10 @@ module.exports = {
         },
         black: '#000000', 
         white: '#FFFFFF', 
-        grey: '#F1F1F1'   
+        grey: '#F1F1F1',
+        darkgrey: '#585858',
+        blue: '#0056b3',
+        red: '#b23239',
       },
       fontSize: {
         'xs': '.75rem',
