@@ -56,7 +56,7 @@ After setting up the virtual environment and installing the required packages, y
 
 Then, in your web browser type in ```http://127.0.0.1:5000```to see the backend server.
 
-### Note
+## Note
 
 Ensure that the `venv` folder is added to your `.gitignore` file to prevent it from being included in the repository.
 
