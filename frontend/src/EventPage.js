@@ -20,10 +20,17 @@ export default function EventPage() {
         <div>
             <h1>Event Page</h1>
             <ul>
-                <button onClick={fetchData}>Fetch Data</button>
+                <button onClick={fetchData} className="border">Fetch Data</button>
                 {data.map((item, index) => (
                     <li key={index}>
-                        {item['First Name']} {item['Last Name']} - {item['Role']}
+                        <div>First Name: {item['First Name']}</div>
+                        <div>Last Name: {item['Last Name']}</div>
+                        <div>Role: {item['Role']}</div>
+                        <div>Email Address: {item['Email Address']}</div>
+                        <div>Phone Number: {item['Phone Number']}</div>
+                        <div>Gender: {item['Gender']}</div>
+                        <div>Ethnicity: {item['Ethnicity']}</div>
+                        <div>Age: {item['Age']}</div>
                     </li>
                 ))}
             </ul>
