@@ -17,25 +17,27 @@ export default function EventPage() {
   };
 
   return (
-    <div>
-      <h1>Event Page</h1>
-      <button onClick={fetchData} className="border">
+    <div className="flex flex-col items-center">
+      <div className="container">
+        <h1>Event Page</h1>
+        <button onClick={fetchData} className="border">
           Fetch Data
         </button>
-      <ul className="flex flex-col gap-y-4">
-        {data.map((item, index) => (
-          <li key={index} className="border">
-            <div>First Name: {item["First Name"]}</div>
-            <div>Last Name: {item["Last Name"]}</div>
-            <div>Role: {item["Role"]}</div>
-            <div>Email Address: {item["Email Address"]}</div>
-            <div>Phone Number: {item["Phone Number"]}</div>
-            <div>Gender: {item["Gender"]}</div>
-            <div>Ethnicity: {item["Ethnicity"]}</div>
-            <div>Age: {item["Age"]}</div>
-          </li>
-        ))}
-      </ul>
+        <ul className="flex flex-col gap-y-4">
+          {data.map((item, index) => (
+            <li key={index} className="border p-4">
+              <div>First Name: {item["First Name"]}</div>
+              <div>Last Name: {item["Last Name"]}</div>
+              <div>Role: {item["Role"]}</div>
+              <div>Email Address: {item["Email Address"]}</div>
+              <div>Phone Number: {item["Phone Number"]}</div>
+              <div>Gender: {item["Gender"]}</div>
+              <div>Ethnicity: {item["Ethnicity"]}</div>
+              <div>Age: {item["Age"]}</div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
