@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
 
+import EventPage from "./pages/events_page";
+
 function App() {
   return (
     <Router>
@@ -21,7 +23,7 @@ function App() {
           </ul>
         </nav>
         <Routes>
-          <Route path="/" element={<p>Events Page</p>} />
+          <Route path="/" element={<EventPage/>} />
           <Route path="/dashboard" element={<p>Dashboard Page</p>} />
           <Route path="/admin" element={<p>Admin Page</p>} />
         </Routes>
