@@ -20,6 +20,8 @@ Run the following command:
 
 ```npm start``` or ```npm run start```
 
+Then, in your web browser type in ```http://localhost:3000```to see the frontend website.
+
 ## Backend Instructions
 
 ### 1. Navigate to backend folder
@@ -51,6 +53,8 @@ To install the required packages, run:
 After setting up the virtual environment and installing the required packages, you can run the server using:
 
 ```python3 server.py```
+
+Then, in your web browser type in ```http://127.0.0.1:5000```to see the backend server.
 
 ### Note
 
