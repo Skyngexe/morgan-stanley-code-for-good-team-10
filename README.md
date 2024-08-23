@@ -50,7 +50,7 @@ To install the required packages, run:
 
 After setting up the virtual environment and installing the required packages, you can run the server using:
 
-```python server.py```
+```python3 server.py```
 
 ### Note
 
