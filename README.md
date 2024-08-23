@@ -60,10 +60,6 @@ Then, in your web browser type in ```http://127.0.0.1:5000```to see the backend 
 
 1. Ensure that the `venv` folder is added to your `.gitignore` file to prevent it from being included in the repository.
 
-```/venv```
-
-2. When installing any new python packages, run this command to automatically update requirements.txt:
-
-```./install_and_update.sh <package>```
+2. When installing any new python packages, run this command to automatically update requirements.txt: ```./install_and_update.sh <package>```
 
 Happy coding!
