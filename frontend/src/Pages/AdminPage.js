@@ -180,7 +180,7 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="mt-20 flex flex-col items-center">
       <div className="container">
         <h1>Admin Page</h1>
         <CreateForm />

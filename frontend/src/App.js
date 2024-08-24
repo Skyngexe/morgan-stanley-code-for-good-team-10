@@ -4,7 +4,7 @@ import logo from "./logo.svg";
 import "./App.css";
 
 
-import AdminPage from "./AdminPage";
+import AdminPage from "./Pages/AdminPage";
 import Header from "./Components/Header";
 import EventPage from "./Pages/EventPage";
 

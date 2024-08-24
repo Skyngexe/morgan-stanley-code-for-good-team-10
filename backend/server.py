@@ -25,7 +25,7 @@ event_db = db_client[EVENT_DB]
 user_db = db_client[USER_DB]
 event_data = event_db['Event Data']
 user_data = event_db['User Data']
-events_detail_collection = db['Event Details']
+events_detail_collection = event_db['Event Details']
 
 class UserRole(Enum):
     """
