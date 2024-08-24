@@ -16,7 +16,7 @@ export const TimerCountdown = () => {
     }, [eventDate]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center">
+        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center bg-lightyellow">
             <h1 className="text-4xl font-bold mb-4">Our next event will start in<br></br></h1>
             {countdown === false ? (
                 <p className="text-4xl text-black font-semibold">

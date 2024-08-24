@@ -32,7 +32,7 @@ function EventGallery(data) {
 return (
     <Container maxWidth="xl">
         <div className='mb-10'>
-            <h2 className="text-3xl font-light mb-4">Upcoming Events</h2>
+            <h2 className="text-3xl font-bold mb-4">Upcoming Events</h2>
             <hr className="mb-6"/>
             {upcomingEventsList && upcomingEventsList.length > 0 ? (
                 <div className="grid grid-cols-4 gap-6">
@@ -46,7 +46,7 @@ return (
 
         </div>
         <div>
-            <h2 className="text-3xl font-light mb-4">Past Events</h2>
+            <h2 className="text-3xl font-bold mb-4">Past Events</h2>
             <hr className="mb-6"/>
             {pastEventsList && pastEventsList.length > 0 ? (
                 <div className="grid grid-cols-4 gap-6">
