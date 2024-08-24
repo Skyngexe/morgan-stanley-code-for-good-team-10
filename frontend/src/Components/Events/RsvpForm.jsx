@@ -9,7 +9,7 @@ function RSVPForm({ upcomingEvents }) {
   
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/events');
+      const response = await axios.get('http://127.0.0.1:5000/eventdata');
       console.log(response.data);
       setEventDataList(response.data);
     } catch (error) {
@@ -27,6 +27,12 @@ function RSVPForm({ upcomingEvents }) {
   });
 
   function handleChange(event) {
+    // const {name, value} = event.target;
+    // setFormData({
+    //   ...formData,
+    //     [name]: value,
+    // });
+
     const selectedEventName = event.target.value;
     const selectedEvent = eventDataList.find(e => e.name === selectedEventName);
     if (selectedEvent) {
@@ -40,13 +46,37 @@ function RSVPForm({ upcomingEvents }) {
 
   return (
     <div className="container mx-auto px-8 py-5 mt-10 mb-16">
-      <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8">
-        <div className='text-2xl font-bold text-blue text-center py-4'>
+      <div className="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+        {/* <div className='text-2xl font-bold text-blue text-center py-8'>
           RSVP
-        </div>
+        </div> */}
         <form>
-          <div className="flex flex-col">
-            <label htmlFor="event" className="mb-2 text-xl">Select Event</label>
+        {/* <div className="flex flex-col mb-4">
+            <label htmlFor="name" className="mb-2 font-medium">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="px-4 py-2 border rounded-lg"
+              required
+            />
+          </div>
+          <div className="flex flex-col mb-4">
+            <label htmlFor="email" className="mb-2 font-medium">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="px-4 py-2 border rounded-lg"
+              required
+            />
+          </div> */}
+          <div className="flex flex-col mb-4">
+            <label htmlFor="event" className="mb-2 font-medium">Select Event</label>
             <select
               id="event"
               name="event"
