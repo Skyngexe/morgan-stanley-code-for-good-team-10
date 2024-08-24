@@ -288,27 +288,6 @@ def create_gform(event_id):
     
     except ValueError as e:
         return {"error": str(e)}, 404 
-    
-def get_responses_with_formId(formId): 
-    SCOPES = "https://www.googleapis.com/auth/forms.responses.readonly"
-    DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-
-    store = file.Storage("token.json")
-    creds = None
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets("credentials.json", SCOPES)
-        creds = tools.run_flow(flow, store)
-
-    form_service = discovery.build(
-        "forms",
-        "v1",
-        http=creds.authorize(Http()),
-        discoveryServiceUrl=DISCOVERY_DOC,
-        static_discovery=False,
-    )
-
-    result = form_service.forms().responses().list(formId=formId).execute()
-    return result
 
 @app.route('/response/form/<formId>', methods=['GET'])
 def get_responses(formId):
