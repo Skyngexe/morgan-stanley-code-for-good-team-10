@@ -7,6 +7,7 @@ import "./App.css";
 import AdminPage from "./Pages/AdminPage";
 import Header from "./Components/Header";
 import EventPage from "./Pages/EventPage";
+import Dashboard from "./Pages/Dashboard";
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<EventPage/>} />
           <Route path="/events" element={<EventPage />} />
-          <Route path="/dashboard" element={<p>Dashboard Page</p>} />
+          <Route path="/dashboard" element={ <Dashboard/>} />
           <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </div>
