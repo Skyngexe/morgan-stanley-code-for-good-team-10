@@ -6,7 +6,7 @@ function EventCard({ event }) {
     function getOnlyDate(endDate) {
         if (endDate) {
             // Split the string at the comma and return the first part
-            return endDate.split(',')[0].trim();
+            return endDate.slice(0, 11);
         }
         return ""; // Return an empty string if endDate is undefined or null
     }
