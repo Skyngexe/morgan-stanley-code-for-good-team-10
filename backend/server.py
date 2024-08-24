@@ -66,7 +66,7 @@ def read_event_data():
 # API Route to get events
 @app.route('/read/events', methods=['GET'])
 def get_events():
-    events = list(events_collection.find({}, {'_id': 0})) 
+    events = list(event_data.find({}, {'_id': 0})) 
     return jsonify(events)
 
 # API Route to create new event and google form
