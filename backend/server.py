@@ -7,7 +7,7 @@ from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 from flask_cors import CORS
-from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, registration_form_questions, create_registration_form
+from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, registration_form_questions, create_registration_form, transform_event_data_to_feedback_questions
 
 app = Flask(__name__)
 CORS(app)
@@ -167,58 +167,6 @@ def update_event_data():
     new_values = request.json.get('new_values', {})
     event_data.update_many(query, {'$set': new_values})
     return jsonify({'message': 'Data updated successfully'})
-
-def transform_event_data_to_feedback_questions(event):
-    # Transform a single event into Google Forms question format
-    questions = []
-
-    # Rating question
-    questions.append({
-        "createItem": {
-            "item": {
-                "title": (
-                    f"How would you rate {event['name']} from 1 (Lowest) to 5 (Highest)?"
-                ),
-                "questionItem": {
-                    "question": {
-                        "required": True,
-                        "choiceQuestion": {
-                            "type": "RADIO",
-                            "options": [
-                                {"value": "1"},
-                                {"value": "2"},
-                                {"value": "3"},
-                                {"value": "4"},
-                                {"value": "5"}
-                            ],
-                            "shuffle": False,
-                        },
-                    }
-                },
-            },
-            "location": {"index": 0},
-        }
-    })
-
-    # Suggestions question
-    questions.append({
-        "createItem": {
-            "item": {
-                "title": "What suggestions do you have for improvement?",
-                "questionItem": {
-                    "question": {
-                        "required": True,
-                        "textQuestion": {
-                            "paragraph": True
-                        },
-                    }
-                },
-            },
-            "location": {"index": 1},
-        }
-    })
-
-    return {"requests": questions}
 
 def fetch_event_data(event_id):
     try:

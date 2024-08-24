@@ -8,6 +8,60 @@ from httplib2 import Http
 from oauth2client import client, file, tools
 from flask_cors import CORS
 
+# Create Feedback Questions
+def transform_event_data_to_feedback_questions(event):
+    # Transform a single event into Google Forms question format
+    questions = []
+
+    # Rating question
+    questions.append({
+        "createItem": {
+            "item": {
+                "title": (
+                    f"How would you rate {event['name']} from 1 (Lowest) to 5 (Highest)?"
+                ),
+                "questionItem": {
+                    "question": {
+                        "required": True,
+                        "choiceQuestion": {
+                            "type": "RADIO",
+                            "options": [
+                                {"value": "1"},
+                                {"value": "2"},
+                                {"value": "3"},
+                                {"value": "4"},
+                                {"value": "5"}
+                            ],
+                            "shuffle": False,
+                        },
+                    }
+                },
+            },
+            "location": {"index": 0},
+        }
+    })
+
+    # Suggestions question
+    questions.append({
+        "createItem": {
+            "item": {
+                "title": "What suggestions do you have for improvement?",
+                "questionItem": {
+                    "question": {
+                        "required": True,
+                        "textQuestion": {
+                            "paragraph": True
+                        },
+                    }
+                },
+            },
+            "location": {"index": 1},
+        }
+    })
+
+    return {"requests": questions}
+
+
 # Creating Google Form
 def registration_form_questions():
     questions = []
