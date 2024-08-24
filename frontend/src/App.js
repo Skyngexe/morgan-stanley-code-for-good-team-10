@@ -14,6 +14,7 @@ import AdminPage from "./Pages/AdminPage";
 import Header from "./Components/Header";
 import EventPage from "./Pages/EventPage";
 import LoginPage from "./Pages/LoginPage";
+import CreateAccountPage from "./Pages/CreateAccountPage";
 
 import useStore from "./Components/secureStore";
 
@@ -30,22 +31,28 @@ function App() {
 
   const SignedIn = ({ children }) => {
     const email = useStore((state) => state.email);
-
-    if (!email) {
-      return null;
+    const accountCreated = useStore((state) => state.accountCreated);
+    if (email && accountCreated) {
+      return <>{children}</>;
     }
+    return null;
+  };
 
-    return <>{children}</>;
+  const CreateAccount = ({ children }) => {
+    const email = useStore((state) => state.email);
+    const accountCreated = useStore((state) => state.accountCreated);
+    if (email && !accountCreated) {
+      return <>{children}</>;
+    }
+    return null;
   };
 
   const SignedOut = ({ children }) => {
     const email = useStore((state) => state.email);
-
-    if (email) {
-      return null;
+    if (!email) {
+      return <>{children}</>;
     }
-
-    return <>{children}</>;
+    return null;
   };
 
   return (
@@ -53,6 +60,9 @@ function App() {
       <SignedOut>
         <LoginPage />
       </SignedOut>
+      <CreateAccount>
+        <CreateAccountPage />
+      </CreateAccount>
       <SignedIn>
         <Router>
           <div className="App">
