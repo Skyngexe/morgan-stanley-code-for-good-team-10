@@ -38,7 +38,7 @@ function CreateAccountPage() {
           },
         }
       );
-      alert(response.data.message);
+      // alert(response.data.message);
       window.location.reload();
     } catch (error) {
       alert(error.response.data.error);
