@@ -305,6 +305,7 @@ def get_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
 
+# API route to get the most updated feedback on an event based on formId
 @app.route('/feedback/show/<formId>', methods=['GET'])
 def get_gform_feedback(formId):
     save_feedback(formId)
@@ -313,6 +314,7 @@ def get_gform_feedback(formId):
         item['_id'] = str(item['_id'])
     return jsonify(feedback)
     
+# save feedback from gform based on formId to Feedback.Event Feedback, one document corresponds to one feedback
 def save_feedback(formId):
     event = get_form_and_resposes(formId)
     
@@ -353,7 +355,7 @@ def save_feedback(formId):
     except Exception as e:
         return {"error": str(e)}, 500
 
-
+# function to save registration reponses (phone number & email) into the event_data based on formId and role 
 def save_registration_responses(data, formId):
     event = fetch_event_data_with_formId(formId)
     try:
