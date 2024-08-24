@@ -50,6 +50,7 @@ def create_new_user():
 def create_new_event():
     try:
         new_event = request.json  # Access JSON data from the request object
+        print(new_event)
         event_data.insert_one(new_event)
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
@@ -68,6 +69,112 @@ def get_events():
     events = list(events_collection.find({}, {'_id': 0})) 
     return jsonify(events)
 
+# API Route to create new event and google form
+@app.route('/create/event', methods=['POST'])
+def create_new_event_and_form():
+    try:
+        new_event = request.json  # Access JSON data from the request object
+        form = create_registration_form(new_event)
+        new_event['form_Id'] = form["form_Id"]
+        new_event['registrationURL'] = form["registrationUrl"]
+        print(new_event)
+        event_data.insert_one(new_event)
+        return jsonify({'message': 'Event data inserted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
+def registration_form_questions():
+    questions = []
+    questions.append({
+        "createItem": {
+            "item": {
+            "title": (
+                "Are you a volunteer or a participant?"
+            ),
+            "questionItem": {
+                "question": {
+                    "required": True,
+                    "choiceQuestion": {
+                        "type": "RADIO",
+                        "options": [
+                            {"value": "Volunteer"},
+                            {"value": "Participant"}
+                        ],
+                        "shuffle": False,
+                    },
+                }
+            },
+        },
+        "location": {"index": 0},
+    }
+    })
+    questions.append({
+        "createItem": {
+            "item": {
+            "title": (
+                "What is your WhatsApp number?"
+            ),
+            "questionItem": {
+                "question": {
+                    "required": True,
+                    "textQuestion": {
+                        "paragraph": True
+                    },
+                }
+            },
+        },
+        "location": {"index": 1},
+    }
+    })
+    return {"requests": questions}
+
+def create_registration_form(new_event):
+    API_SCOPES = "https://www.googleapis.com/auth/forms.body"
+    DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+    store = file.Storage("token.json")
+    creds = None
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets("credentials.json", API_SCOPES)
+        creds = tools.run_flow(flow, store)
+    form_service = discovery.build(
+        "forms",
+        "v1",
+        http=creds.authorize(Http()),
+        discoveryServiceUrl=DISCOVERY_DOC,
+        static_discovery=False,
+    )
+    # Request body for creating a form
+    NEW_FORM = {
+        "info": {
+            "title": f"{new_event['name']} Registration Form",
+        }
+    }
+
+    # Creates the initial form
+    result = form_service.forms().create(body=NEW_FORM).execute()
+    # Adds the question to the form
+    update_body = {
+        "requests": [
+            {
+                "updateFormInfo": {
+                    "info": {
+                        "description": f"Description: {new_event['descriptions']}\nLocation: {new_event['location']}\nDate: {new_event['startDate']} - {new_event['endDate']}\nVolunteers needed: {new_event['volunteer_Quota']}\nParticipants needed: {new_event['participant_Quota']}"
+                    },
+                    "updateMask": "description"
+                }
+            }
+        ]
+    }
+    
+    # Adds the description and other settings to the form
+    form_service.forms().batchUpdate(formId=result["formId"], body=update_body).execute()
+    form_service.forms().batchUpdate(formId=result["formId"], body=registration_form_questions()).execute()
+    
+    # Prints the result to show the question has been added
+    get_result = form_service.forms().get(formId=result["formId"]).execute()
+    print(get_result)
+    print(result)
+    return {"form_Id": result["formId"], "registrationUrl": result["responderUri"]}
 
 @app.route('/healthcheck')
 def healthcheck():
@@ -154,7 +261,7 @@ def transform_event_data_to_feedback_questions():
         return {"requests": questions}
 
 # API to create form
-@app.route('/form/create', methods=['POST'])
+@app.route('/create/form', methods=['POST'])
 def create_gform():
     SCOPES = "https://www.googleapis.com/auth/forms.body"
     DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
@@ -215,11 +322,6 @@ def get_form_item():
     formId = "1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo"
     data = get_form_and_resposes(formId)
     return data
-
-# Connect to MongoDB
-client = MongoClient("mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-db = client['Event']
-events_collection = db['Event Data']
     
 if __name__ == "__main__":
     app.run(debug=True)
