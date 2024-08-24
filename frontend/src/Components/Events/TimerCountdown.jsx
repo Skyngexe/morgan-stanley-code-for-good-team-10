@@ -3,7 +3,7 @@ import TimerLogic from './TimerLogic';
 
 export const TimerCountdown = () => {
     // To revisit the logic of popping the next event date, for now hardcoded first :)
-    const eventDate = "2024-08-28T17:00:00";
+    const eventDate = "2024-08-27T17:00:00";
     const [countdown, setCountdown] = useState(() => TimerLogic(eventDate) || []);
 
     useEffect(() => {
@@ -17,7 +17,7 @@ export const TimerCountdown = () => {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[40vh] text-center">
-            <h1 className="text-4xl font-bold mb-4">Our next event starts in<br></br></h1>
+            <h1 className="text-4xl font-bold mb-4">Our next event will start in<br></br></h1>
             {countdown === false ? (
                 <p className="text-4xl text-black font-semibold">
                     That is all folks!
