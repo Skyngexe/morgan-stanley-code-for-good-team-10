@@ -15,6 +15,7 @@ import useStore from "./Components/secureStore";
 
 function App() {
   const googleId = useStore((state) => state.googleId);
+  const setRole = useStore((state) => state.setRole);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["user", googleId],
@@ -42,6 +43,8 @@ function App() {
   } else if (data.message !== "User found") {
     return <div>Server Error</div>;
   }
+  setRole(data.user.role);
+  console.log("role:", data.user.role);
 
   return (
     <Router>

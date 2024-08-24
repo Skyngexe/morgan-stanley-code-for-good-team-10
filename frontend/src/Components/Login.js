@@ -26,8 +26,7 @@ function LoginButton() {
       });
 
     if (data.message === "User not found") {
-      // Create New User
-      console.log("Creating New User");
+      console.log("Creating New User...");
     }
     console.log("[Login Success] currentUser:", res.profileObj);
   };

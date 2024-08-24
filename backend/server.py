@@ -58,7 +58,7 @@ def get_user_by_google_id(id):
     if user:
         # Convert ObjectId to string
         user['_id'] = str(user['_id'])
-        return jsonify({"message": "User found", "data": user})
+        return jsonify({"message": "User found", "user": user})
     else:
         return jsonify({"message": "User not found"})
 
