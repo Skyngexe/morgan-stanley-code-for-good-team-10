@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default function AdminPage() {
   const [itemData, setItemData] = useState();
+  const [events, setEvents] = useState();
 
   const fetchItem = async () => {
     axios
@@ -18,39 +19,20 @@ export default function AdminPage() {
       });
   };
 
-  //   const fetchResponses = async () => {
-  //     axios
-  //       .get("http://127.0.0.1:5000/form/responses")
-  //       .then((response) => {
-  //         console.log(response.data.data);
-  //         setResponsesData(response.data.data);
-  //         return response.data.data;
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error fetching data:", error);
-  //         return { error: error };
-  //       });
-  //   };
-
-  //   const fetchForm = async () => {
-  //     axios
-  //       .get("http://127.0.0.1:5000/form/get")
-  //       .then((response) => {
-  //         const form = response.data.data;
-  //         console.log(form);
-  //         setFormData(form);
-  //         const questionMap = form.items.reduce((map, item) => {
-  //           if (item.questionItem) {
-  //             map[item.questionItem.question.questionId] = item.title;
-  //           }
-  //           return map;
-  //         }, {});
-  //         console.log(questionMap);
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error fetching data:", error);
-  //       });
-  //   };
+  const fetchEvents = async () => {
+    axios
+      .get("http://127.0.0.1:5000/events")
+      .then((response) => {
+        console.log(response.data);
+        setEvents(response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        return { error: error };
+      });
+  };
+  fetchEvents();
 
   return (
     <div className="flex flex-col items-center">
@@ -84,6 +66,19 @@ export default function AdminPage() {
             </>
           )}
         </ul>
+        {/* <div>{JSON.stringify(events)}</div> */}
+        <div>
+          {events && events.map((event, index) => (
+            <div key={index} className="border">
+              <strong>Name:</strong> {event.name} <br />
+              <strong>Location:</strong> {event.location} <br />
+              <strong>Start Date:</strong> {event.startDate} <br />
+              <strong>End Date:</strong> {event.endDate} <br />
+              <strong>Event Type:</strong> {event.eventType} <br />
+              <strong>Status:</strong> {event.status}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
