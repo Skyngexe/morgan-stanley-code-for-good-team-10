@@ -36,7 +36,7 @@ return (
             <hr className="mb-6"/>
             {upcomingEventsList && upcomingEventsList.length > 0 ? (
                 <div className="grid grid-cols-4 gap-6">
-                    {upcomingEventsList.map((event, index) => (
+                    {upcomingEventsList.slice(0, 4).map((event, index) => (
                         <EventCard key={index} event={event} />
                     ))}
                 </div>
