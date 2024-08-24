@@ -5830,3 +5830,8 @@ venv/Scripts/pip3.10.exe
 venv/Scripts/pip3.exe
 venv/Scripts/python.exe
 venv/Scripts/pythonw.exe
+.idea/modules.xml
+.idea/morgan-stanley-code-for-good-team-10.iml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/inspectionProfiles/profiles_settings.xml
