@@ -9,6 +9,7 @@ function LoginButton() {
   const setEmail = useStore((state) => state.setEmail);
   const setImageUrl = useStore((state) => state.setImageUrl);
   const setGoogleId = useStore((state) => state.setGoogleId);
+  const setAccountCreated = useStore((state) => state.setAccountCreated);
 
   const onSuccess = async (res) => {
     setEmail(res.profileObj.email);
@@ -22,11 +23,15 @@ function LoginButton() {
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
-        return { "message": error };
+        return { message: error };
       });
+
+    if (data.message === "User found") {
+      setAccountCreated(true);
+    }
     if (data.message === "User not found") {
-        // Create New User
-        console.log("Creating New User");
+      // Create New User
+      console.log("Creating New User");
     }
     console.log("[Login Success] currentUser:", res.profileObj);
   };

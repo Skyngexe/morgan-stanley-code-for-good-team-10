@@ -20,18 +20,10 @@ import useStore from "./Components/secureStore";
 
 function App() {
   const email = useStore((state) => state.email);
-  useEffect(() => {
-    console.log("email", email);
-  }, [email]);
-
   const imageUrl = useStore((state) => state.imageUrl);
-  useEffect(() => {
-    console.log("imageUrl", imageUrl);
-  }, [imageUrl]);
+  const accountCreated = useStore((state) => state.accountCreated);
 
   const SignedIn = ({ children }) => {
-    const email = useStore((state) => state.email);
-    const accountCreated = useStore((state) => state.accountCreated);
     if (email && accountCreated) {
       return <>{children}</>;
     }
@@ -39,8 +31,6 @@ function App() {
   };
 
   const CreateAccount = ({ children }) => {
-    const email = useStore((state) => state.email);
-    const accountCreated = useStore((state) => state.accountCreated);
     if (email && !accountCreated) {
       return <>{children}</>;
     }
@@ -48,7 +38,6 @@ function App() {
   };
 
   const SignedOut = ({ children }) => {
-    const email = useStore((state) => state.email);
     if (!email) {
       return <>{children}</>;
     }
