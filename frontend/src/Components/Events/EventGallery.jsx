@@ -10,7 +10,7 @@ function EventGallery(data) {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/events');
+      const response = await axios.get('http://127.0.0.1:5000/eventdata');
       const events = response.data;
       const today = new Date();
 

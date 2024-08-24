@@ -1,7 +1,9 @@
 import React from 'react';
 import { Chip, Box, Grid, Typography, Card, CardMedia, CardContent, Stack } from '@mui/material';
+import EventDetailDialog from './EventDetailDIalog';
 
 function EventCard({ event }) {
+    const [openDialog, setOpenDialog] = React.useState(false);
 
     function getOnlyDate(endDate) {
         if (endDate) {
@@ -11,8 +13,17 @@ function EventCard({ event }) {
         return ""; // Return an empty string if endDate is undefined or null
     }
 
+    function handleOpenDialog() {
+        setOpenDialog(true);
+    }
+    
+    function handleCloseDialog() {
+        setOpenDialog(false);
+    }
+    
+
     return (
-        <Card className="max-w-s p-4 bg-white rounded-lg shadow-lg">
+        <Card className="max-w-s p-4 bg-white rounded-lg shadow-lg" onClick={handleOpenDialog}>
         <CardContent>
             <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -43,6 +54,7 @@ function EventCard({ event }) {
             </Grid>
             </Grid>
         </CardContent>
+        <EventDetailDialog open={openDialog} onClose={handleCloseDialog} event={event} />
         </Card>
     );
 }

@@ -18,12 +18,19 @@ def healthcheck():
 client = MongoClient("mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 db = client['Event']
 events_collection = db['Event Data']
+events_detail_collection = db['Event Details']
 
 # API Route to get events
-@app.route('/events', methods=['GET'])
-def get_events():
+@app.route('/eventdata', methods=['GET'])
+def get_event_data():
     events = list(events_collection.find({}, {'_id': 0})) 
     return jsonify(events)
+
+@app.route('/eventsdetails', methods=['GET'])
+def get_event_details():
+    events = list(events_detail_collection.find({}, {'_id': 0})) 
+    return jsonify(events)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
