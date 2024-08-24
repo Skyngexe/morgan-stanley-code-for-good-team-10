@@ -45,6 +45,7 @@ class UserRole(Enum):
 def default():
     return 'Team 10 server'
 
+# API Route to create users
 @app.route('/write/user', methods=['POST'])
 def create_new_user():
     """
@@ -91,6 +92,7 @@ def create_new_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+# API Route to create event
 @app.route('/write/event', methods=['POST'])
 def create_new_event():
     """
@@ -130,6 +132,7 @@ def create_new_event():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
     
+# API Route to get single event
 @app.route('/read/event', methods=['GET'])
 def read_event_data():
     data = list(event_data.find({}))
@@ -137,7 +140,7 @@ def read_event_data():
         event['_id'] = str(event['_id'])  # Convert ObjectId to string
     return jsonify(json.loads(json_util.dumps(data)))
 
-# API Route to get events
+# API Route to get all events
 @app.route('/read/events', methods=['GET'])
 def get_events():
     events = list(event_data.find({}, {'_id': 0})) 
