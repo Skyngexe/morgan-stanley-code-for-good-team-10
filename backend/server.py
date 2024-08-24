@@ -185,10 +185,9 @@ def create_gform():
     get_result = form_service.forms().get(formId=result["formId"]).execute()
     print(get_result)
     return get_result
-   
-@app.route('/get/responses', methods=['GET'])
-def get_responses():
-    SCOPES = "https://www.googleapis.com/auth/forms.body"
+
+def get_responses_with_formId(formId): 
+    SCOPES = "https://www.googleapis.com/auth/forms.responses.readonly"
     DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
 
     store = file.Storage("token.json")
@@ -205,9 +204,14 @@ def get_responses():
         static_discovery=False,
     )
 
-    result = form_service.forms().get(formId="1FAIpQLSeNAO207eIgNTLcpzWh97hS9ec2tZ3H5UE5LnK2cGl2HBnmbw").execute()
-    print(result)
-    return {"data": result}
+    result = form_service.forms().responses().list(formId=formId).execute()
+    return result
+
+@app.route('/get/responses', methods=['GET'])
+def get_responses():
+    data = get_responses_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
+    print(data)
+    return {"data": data}
     
 if __name__ == "__main__":
     app.run(debug=True)
