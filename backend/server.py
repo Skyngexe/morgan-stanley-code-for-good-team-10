@@ -207,7 +207,7 @@ def get_responses_with_formId(formId):
     result = form_service.forms().responses().list(formId=formId).execute()
     return result
 
-@app.route('/get/responses', methods=['GET'])
+@app.route('/response/form', methods=['GET'])
 def get_responses():
     data = get_responses_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
     print(data)
