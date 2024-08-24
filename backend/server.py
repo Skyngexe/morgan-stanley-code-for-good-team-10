@@ -244,14 +244,15 @@ def extract_time(datetime):
     time = datetime.fromisoformat(str(datetime)) 
     return time.strftime("%H:%M:%S")
 
-def store_event_feedback_link(feedback_url, event_id):
+def store_event_feedback_link(feedback_url, event_id, gform_id):
     try:
         event = event_data.find_one({"eventId": event_id})
 
         if event:
             event_data.update_one(
                 {"eventId": event_id},
-                {"$set": {"feedbackURL": feedback_url}}
+                {"$set": {"feedbackURL": feedback_url}},
+                {"$set": {"formID": gform_id}}
             )
             return {"message": "Feedback URL added successfully."}, 200
         
@@ -306,9 +307,10 @@ def create_gform(event_id):
         # Prints the result to show the question has been added
         get_result = form_service.forms().get(formId=result["formId"]).execute()
         gform_url = get_result.get("responderUri")
+        gform_id = get_result.get("formId")
 
         if gform_url:
-            store_event_feedback_link(gform_url, event_id)
+            store_event_feedback_link(gform_url, event_id, gform_id)
         return get_result
     
     except ValueError as e:
@@ -336,12 +338,13 @@ def get_responses_with_formId(formId):
     return result
 
 @app.route('/response/form/<formId>', methods=['GET'])
-def get_responses(formID):
-    data = get_responses_with_formId(formID)
+def get_responses(formId):
+    data = get_responses_with_formId(formId)
     print(data)
     return {"data": data}
 
-# write a function that gets data from event data and event details and merge them so frontend can use it 
+
+# find reponses in gform and update participants list 
 
     
 if __name__ == "__main__":
