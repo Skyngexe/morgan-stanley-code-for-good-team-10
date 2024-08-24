@@ -41,7 +41,7 @@ function CreateForm() {
           },
         }
       );
-      // alert(response.data.message);
+      alert(response.data.message);
     } catch (error) {
       alert(error.response.data.error);
     }
