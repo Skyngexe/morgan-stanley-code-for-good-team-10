@@ -208,17 +208,6 @@ def get_responses():
     result = form_service.forms().get(formId="1FAIpQLSeNAO207eIgNTLcpzWh97hS9ec2tZ3H5UE5LnK2cGl2HBnmbw").execute()
     print(result)
     return {"data": result}
-    # Adds the question to the form
-    # question_setting = (
-    #     form_service.forms()
-    #     .batchUpdate(formId=result["formId"], body=transform_event_data_to_feedback_questions())
-    #     .execute()
-    # )
-
-    # # Prints the result to show the question has been added
-    # get_result = form_service.forms().get(formId=result["formId"]).execute()
-    # print(get_result)
-    # return get_result
     
 if __name__ == "__main__":
     app.run(debug=True)
