@@ -6,6 +6,7 @@ import json
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -143,62 +144,95 @@ def update_event_data():
     event_data.update_many(query, {'$set': new_values})
     return jsonify({'message': 'Data updated successfully'})
 
-def transform_event_data_to_feedback_questions():
-    # Fetch events and transform them into Google Forms question format
-        data = list(event_data.find({}))
-        questions = []
+def transform_event_data_to_feedback_questions(event):
+    # Transform a single event into Google Forms question format
+    questions = []
 
-        for event in data:
-            questions.append({
-                "createItem": {
-                    "item": {
-                    "title": (
-                        f"How would you rate {event['name']} from 1 (Lowest) to 5 (Highest)?"
-                    ),
-                    "questionItem": {
-                        "question": {
-                            "required": True,
-                            "choiceQuestion": {
-                                "type": "RADIO",
-                                "options": [
-                                    {"value": "1"},
-                                    {"value": "2"},
-                                    {"value": "3"},
-                                    {"value": "4"},
-                                    {"value": "5"}
-                                ],
-                                "shuffle": False,
-                            },
-                        }
-                    },
+    # Rating question
+    questions.append({
+        "createItem": {
+            "item": {
+                "title": (
+                    f"How would you rate {event['name']} from 1 (Lowest) to 5 (Highest)?"
+                ),
+                "questionItem": {
+                    "question": {
+                        "required": True,
+                        "choiceQuestion": {
+                            "type": "RADIO",
+                            "options": [
+                                {"value": "1"},
+                                {"value": "2"},
+                                {"value": "3"},
+                                {"value": "4"},
+                                {"value": "5"}
+                            ],
+                            "shuffle": False,
+                        },
+                    }
                 },
-                "location": {"index": 0},
-            }
-            })
+            },
+            "location": {"index": 0},
+        }
+    })
 
-            questions.append({
-                "createItem": {
-                    "item": {
-                    "title": (
-                        "What suggestions do you have for improvement?"
-                    ),
-                    "questionItem": {
-                        "question": {
-                            "required": True,
-                            "textQuestion": {
-                                "paragraph": True
-                            },
-                        }
-                    },
+    # Suggestions question
+    questions.append({
+        "createItem": {
+            "item": {
+                "title": "What suggestions do you have for improvement?",
+                "questionItem": {
+                    "question": {
+                        "required": True,
+                        "textQuestion": {
+                            "paragraph": True
+                        },
+                    }
                 },
-                "location": {"index": 1},
-            }
-            })
+            },
+            "location": {"index": 1},
+        }
+    })
 
-        return {"requests": questions}
+    return {"requests": questions}
 
-@app.route('/create/form', methods=['POST'])
-def create_gform():
+def fetch_event_data(event_id):
+    try:
+        event = event_data.find_one({"eventId": event_id})
+        if event:
+            return event  # Return the event data as a dictionary
+        else:
+            raise ValueError("Event not found.")
+    except Exception as e:
+        raise ValueError(f"Error fetching event: {str(e)}")
+    
+def extract_date(datetime):
+    start_date = datetime.fromisoformat(str(datetime)) 
+    return start_date.strftime("%Y-%m-%d")
+
+def extract_time(datetime):
+    time = datetime.fromisoformat(str(datetime)) 
+    return time.strftime("%H:%M:%S")
+
+def store_event_feedback_link(feedback_url, event_id):
+    try:
+        event = event_data.find_one({"eventId": event_id})
+
+        if event:
+            event_data.update_one(
+                {"eventId": event_id},
+                {"$set": {"feedbackURL": feedback_url}}
+            )
+            return {"message": "Feedback URL added successfully."}, 200
+        
+        else:
+            raise ValueError("Event not found.")
+        
+    except Exception as e:
+        raise ValueError(f"Error fetching event: {str(e)}")
+
+@app.route('/create/form/<int:event_id>', methods=['POST'])
+def create_gform(event_id):
     SCOPES = "https://www.googleapis.com/auth/forms.body"
     DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
 
@@ -216,27 +250,40 @@ def create_gform():
         static_discovery=False,
     )
 
-    # Request body for creating a form
-    NEW_FORM = {
-        "info": {
-            "title": "Event feeback form",
+
+    try:
+        event_data_for_gform = fetch_event_data(event_id) 
+        event_start_time = extract_time(event_data_for_gform['startDate'])
+        event_end_time = extract_time(event_data_for_gform['endDate'])
+        event_date = extract_date(event_data_for_gform['startDate'])
+        # Request body for creating a form
+        NEW_FORM = {
+            "info": {
+                "title": f" Feedback form on {event_data_for_gform['name']} that is hosted on f{event_date} from {event_start_time} to {event_end_time}"
+            }
         }
-    }
 
-    # Creates the initial form
-    result = form_service.forms().create(body=NEW_FORM).execute()
+        # Creates the initial form
+        result = form_service.forms().create(body=NEW_FORM).execute()
 
-    # Adds the question to the form
-    question_setting = (
-        form_service.forms()
-        .batchUpdate(formId=result["formId"], body=transform_event_data_to_feedback_questions())
-        .execute()
-    )
+        # Adds the questions based on event data
+        question_setting = (
+            form_service.forms()
+            .batchUpdate(formId=result["formId"], body=transform_event_data_to_feedback_questions(event_data_for_gform))  # Update function
+            .execute()
+        )
 
-    # Prints the result to show the question has been added
-    get_result = form_service.forms().get(formId=result["formId"]).execute()
-    return get_result
+        # Prints the result to show the question has been added
+        get_result = form_service.forms().get(formId=result["formId"]).execute()
+        gform_url = get_result.get("responderUri")
 
+        if gform_url:
+            store_event_feedback_link(gform_url, event_id)
+        return get_result
+    
+    except ValueError as e:
+        return {"error": str(e)}, 404 
+    
 def get_responses_with_formId(formId): 
     SCOPES = "https://www.googleapis.com/auth/forms.responses.readonly"
     DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
@@ -263,6 +310,8 @@ def get_responses():
     data = get_responses_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
     print(data)
     return {"data": data}
+
+
     
 if __name__ == "__main__":
     app.run(debug=True)
