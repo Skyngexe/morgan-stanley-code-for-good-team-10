@@ -8,7 +8,7 @@ from httplib2 import Http
 from oauth2client import client, file, tools
 from datetime import datetime
 from flask_cors import CORS
-
+from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, registration_form_questions, create_registration_form, transform_event_data_to_feedback_questions
 app = Flask(__name__)
 CORS(app)
 
@@ -343,6 +343,41 @@ def get_responses(formId):
     print(data)
     return {"data": data}
 
+# API to get form responses using a fixed form ID
+@app.route('/form/responses', methods=['GET'])
+def get_fixed_responses():
+    data = get_responses_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
+    print(data)
+    return {"data": data}
+
+# API to get form details
+@app.route('/form/get', methods=['GET'])
+def get_form():
+    data = get_form_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
+    print(data)
+    return {"data": data}
+
+# API to get form questions and responses
+@app.route('/form/item', methods=['GET'])
+def get_form_item():
+    formId = "1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo"
+    data = get_form_and_responses(formId)
+    return data
+
+# API Route to get events
+@app.route('/eventdata', methods=['GET'])
+def get_event_data():
+    events = list(event_data.find({}, {'_id': 0})) 
+    return jsonify(events)
+
+# API Route to get event details
+@app.route('/eventsdetails', methods=['GET'])
+def get_event_details():
+    events = list(events_detail_collection.find({}, {'_id': 0})) 
+    return jsonify(events)
+
+def save_responses():
+    pass
 
 # find reponses in gform and update participants list 
 
