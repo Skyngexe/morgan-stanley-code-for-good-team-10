@@ -54,7 +54,7 @@ function CreateAccountPage() {
         }
       );
       alert(response.data.message);
-      setAccountCreated(true);
+      window.location.reload();
     } catch (error) {
       alert(error.response.data.error);
     }

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
 import axios from "axios";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import AdminPage from "./Pages/AdminPage";
 import Header from "./Components/Header";
@@ -16,18 +16,18 @@ import useStore from "./Components/secureStore";
 function App() {
   const googleId = useStore((state) => state.googleId);
 
-  const { data, isLoading, error } = useQuery(["user", googleId], () =>
-    axios
-      .get(`http://127.0.0.1:5000/read/user/${googleId}`)
-      .then((res) => res.data)
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        return <div>Server Error</div>;
-      }),
-      {
-        enabled: !!googleId, // Only run the query if googleId is available
-      }
-  );
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user", googleId],
+    queryFn: () =>
+      axios
+        .get(`http://127.0.0.1:5000/read/user/${googleId}`)
+        .then((res) => res.data)
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          return { message: "Server Error" };
+        }),
+    enabled: !!googleId, // Only run the query if googleId is available
+  });
 
   if (!googleId) {
     return <LoginPage />;
