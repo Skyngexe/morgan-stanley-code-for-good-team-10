@@ -26,7 +26,7 @@ function App() {
           console.error("Error fetching data:", error);
           return { message: "Server Error" };
         }),
-    enabled: !!googleId, // Only run the query if googleId is available
+    enabled: !!googleId,
   });
 
   if (!googleId) {
@@ -43,40 +43,7 @@ function App() {
     return <div>Server Error</div>;
   }
 
-  // const email = useStore((state) => state.email);
-  // const imageUrl = useStore((state) => state.imageUrl);
-  // const accountCreated = useStore((state) => state.accountCreated);
-
-  // const SignedOut = ({ children }) => {
-  //   if (!email) {
-  //     return <>{children}</>;
-  //   }
-  //   return null;
-  // };
-
-  // const CreateAccount = ({ children }) => {
-  //   if (email && !accountCreated) {
-  //     return <>{children}</>;
-  //   }
-  //   return null;
-  // };
-
-  // const SignedIn = ({ children }) => {
-  //   if (email && accountCreated) {
-  //     return <>{children}</>;
-  //   }
-  //   return null;
-  // };
-
   return (
-    // <header>
-    //   <SignedOut>
-    //     <LoginPage />
-    //   </SignedOut>
-    //   <CreateAccount>
-    //     <CreateAccountPage />
-    //   </CreateAccount>
-    //   <SignedIn>
     <Router>
       <div className="App">
         <Header />
@@ -88,8 +55,6 @@ function App() {
         </Routes>
       </div>
     </Router>
-    //   </SignedIn>
-    // </header>
   );
 }
 
