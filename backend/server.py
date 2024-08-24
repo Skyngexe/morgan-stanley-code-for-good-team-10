@@ -6,13 +6,15 @@ import json
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
+from flask_cors import CORS
+from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes
 
 app = Flask(__name__)
+CORS(app)
 MONGO_URI = "mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 EVENT_DB = "Event"
 USER_DB = 'User'
-
 
 # Connect to MongoDB
 db_client = MongoClient(MONGO_URI)
@@ -145,7 +147,8 @@ def transform_event_data_to_feedback_questions():
         '''
         return {"requests": questions}
 
-@app.route('/create/form', methods=['POST'])
+# API to create form
+@app.route('/form/create', methods=['POST'])
 def create_gform():
     SCOPES = "https://www.googleapis.com/auth/forms.body"
     DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
@@ -186,32 +189,37 @@ def create_gform():
     print(get_result)
     return get_result
 
-def get_responses_with_formId(formId): 
-    SCOPES = "https://www.googleapis.com/auth/forms.responses.readonly"
-    DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-
-    store = file.Storage("token.json")
-    creds = None
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets("credentials.json", SCOPES)
-        creds = tools.run_flow(flow, store)
-
-    form_service = discovery.build(
-        "forms",
-        "v1",
-        http=creds.authorize(Http()),
-        discoveryServiceUrl=DISCOVERY_DOC,
-        static_discovery=False,
-    )
-
-    result = form_service.forms().responses().list(formId=formId).execute()
-    return result
-
-@app.route('/response/form', methods=['GET'])
+# API to get form responses
+@app.route('/form/responses', methods=['GET'])
 def get_responses():
     data = get_responses_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
     print(data)
     return {"data": data}
+
+# API to get form
+@app.route('/form/get', methods=['GET'])
+def get_form():
+    data = get_form_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
+    print(data)
+    return {"data": data}
+
+# API to get form questions and responses
+@app.route('/form/item', methods=['GET'])
+def get_form_item():
+    formId = "1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo"
+    data = get_form_and_resposes(formId)
+    return data
+
+# Connect to MongoDB
+client = MongoClient("mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+db = client['Event']
+events_collection = db['Event Data']
+
+# API Route to get events
+@app.route('/events', methods=['GET'])
+def get_events():
+    events = list(events_collection.find({}, {'_id': 0})) 
+    return jsonify(events)
     
 if __name__ == "__main__":
     app.run(debug=True)
