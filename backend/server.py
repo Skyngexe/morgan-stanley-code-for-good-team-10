@@ -7,8 +7,10 @@ from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 from datetime import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 
 MONGO_URI = "mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -22,6 +24,7 @@ event_db = db_client[EVENT_DB]
 user_db = db_client[USER_DB]
 event_data = event_db['Event Data']
 user_data = event_db['User Data']
+events_detail_collection = db['Event Details']
 
 class UserRole(Enum):
     """
@@ -311,7 +314,17 @@ def get_responses():
     print(data)
     return {"data": data}
 
+# API Route to get events
+@app.route('/eventdata', methods=['GET'])
+def get_event_data():
+    events = list(event_data.find({}, {'_id': 0})) 
+    return jsonify(events)
 
-    
+@app.route('/eventsdetails', methods=['GET'])
+def get_event_details():
+    events = list(events_detail_collection.find({}, {'_id': 0})) 
+    return jsonify(events)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
