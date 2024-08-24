@@ -6,17 +6,18 @@ import json
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
-from datetime import datetime
 from flask_cors import CORS
+from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, registration_form_questions, create_registration_form
 
 app = Flask(__name__)
 CORS(app)
+
+from datetime import datetime
 
 
 MONGO_URI = "mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 EVENT_DB = "Event"
 USER_DB = 'User'
-
 
 # Connect to MongoDB
 db_client = MongoClient(MONGO_URI)
@@ -123,6 +124,7 @@ def create_new_event():
     """
     try:
         new_event = request.json  # Access JSON data from the request object
+        print(new_event)
         event_data.insert_one(new_event)
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
@@ -135,7 +137,26 @@ def read_event_data():
         event['_id'] = str(event['_id'])  # Convert ObjectId to string
     return jsonify(json.loads(json_util.dumps(data)))
 
+# API Route to get events
+@app.route('/read/events', methods=['GET'])
+def get_events():
+    events = list(event_data.find({}, {'_id': 0})) 
+    return jsonify(events)
 
+# API Route to create new event and google form
+@app.route('/create/event', methods=['POST'])
+def create_new_event_and_form():
+    try:
+        new_event = request.json  # Access JSON data from the request object
+        form = create_registration_form(new_event)
+        new_event['form_Id'] = form["form_Id"]
+        new_event['registrationURL'] = form["registrationUrl"]
+        print(new_event)
+        event_data.insert_one(new_event)
+        return jsonify({'message': 'Event data inserted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
 @app.route('/healthcheck')
 def healthcheck():
     return 'Server is up and running!'
@@ -234,6 +255,7 @@ def store_event_feedback_link(feedback_url, event_id):
     except Exception as e:
         raise ValueError(f"Error fetching event: {str(e)}")
 
+# API to create form
 @app.route('/create/form/<int:event_id>', methods=['POST'])
 def create_gform(event_id):
     SCOPES = "https://www.googleapis.com/auth/forms.body"
@@ -308,12 +330,26 @@ def get_responses_with_formId(formId):
     result = form_service.forms().responses().list(formId=formId).execute()
     return result
 
-@app.route('/response/form', methods=['GET'])
+@app.route('/form/responses', methods=['GET'])
 def get_responses():
     data = get_responses_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
     print(data)
     return {"data": data}
 
+# API to get form
+@app.route('/form/get', methods=['GET'])
+def get_form():
+    data = get_form_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
+    print(data)
+    return {"data": data}
+
+# API to get form questions and responses
+@app.route('/form/item', methods=['GET'])
+def get_form_item():
+    formId = "1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo"
+    data = get_form_and_resposes(formId)
+    return data
+    
 # API Route to get events
 @app.route('/eventdata', methods=['GET'])
 def get_event_data():
