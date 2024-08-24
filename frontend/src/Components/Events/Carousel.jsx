@@ -28,7 +28,7 @@ function Carousel() {
   };
 
   return (
-    <div className="relative w-3/4 mx-auto mt-10 h-[700px]">
+    <div className="relative w-3/4 mx-auto h-[600px]">
       {events.map((event, index) => (
         <div
           key={index}
@@ -38,7 +38,7 @@ function Carousel() {
         >
           <img src={event.image} alt={event.title} className="object-cover w-full h-full rounded-xl" />
           <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 p-4 rounded-lg">
-            <h1 className="text-2xl font-bold text-white">{event.title}</h1>
+            <h1 className="text-lg font-bold text-white">{event.title}</h1>
             <p className="text-white">{event.description}</p>
           </div>
         </div>
