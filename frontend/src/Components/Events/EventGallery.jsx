@@ -3,8 +3,9 @@ import axios from 'axios';
 import { Container } from '@mui/material';
 import EventCard from './EventCard'; 
 
-function EventGallery(data) {
+function EventGallery() {
   const [eventDataList, setEventDataList] = useState([]);
+//   const [eventDetails, setEventDetails] = useState(null);
   const [upcomingEventsList, setUpcomingEventsList] = useState([]);
   const [pastEventsList, setPastEventsList] = useState([]);
 
@@ -25,8 +26,22 @@ function EventGallery(data) {
     }
   };
 
+//   const fetchDataDetails = async () => {
+//     try {
+//       const response = await axios.get('http://127.0.0.1:5000/eventdetails');
+//       const events = response.data;
+
+//       setEventDetails(events);
+//       console.log("Event Details: ", events);
+
+//     } catch (error) {
+//       console.error('Error fetching data:', error);
+//     }
+//   };
+
   useEffect(() => {
     fetchData();
+    // fetchDataDetails();
   }, []);
 
 return (
@@ -37,7 +52,7 @@ return (
             {upcomingEventsList && upcomingEventsList.length > 0 ? (
                 <div className="grid grid-cols-4 gap-6">
                     {upcomingEventsList.slice(0, 4).map((event, index) => (
-                        <EventCard key={index} event={event} />
+                        <EventCard key={index} event={event}/>
                     ))}
                 </div>
             ) : (

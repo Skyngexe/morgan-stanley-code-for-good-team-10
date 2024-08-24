@@ -26,10 +26,39 @@ def get_event_data():
     events = list(events_collection.find({}, {'_id': 0})) 
     return jsonify(events)
 
-@app.route('/eventsdetails', methods=['GET'])
+@app.route('/eventdetails', methods=['GET'])
 def get_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
+
+@app.route('/combined_events', methods=['GET'])
+def combined_events():
+    # Adjusted aggregation pipeline for a left join-like behavior
+    result = db.event_data.aggregate([
+        {
+            '$lookup': {
+                'from': 'event_details',
+                'localField': 'eventId',
+                'foreignField': 'eventId',
+                'as': 'eventDetails'
+            }
+        },
+        {
+            '$unwind': {
+                'path': '$eventDetails',
+                'preserveNullAndEmptyArrays': True  # Ensures non-matched are included
+            }
+        },
+        {
+            '$project': {
+                # Specify fields to include or exclude
+                'eventId': 1,
+                'eventDetails': 1
+                # Add other fields as needed
+            }
+        }
+    ])
+    return jsonify(list(result))
 
 
 if __name__ == "__main__":
