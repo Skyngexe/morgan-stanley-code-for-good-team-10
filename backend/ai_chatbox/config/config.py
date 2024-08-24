@@ -1,19 +1,17 @@
-import openai
+from openai import OpenAI
 
 # Replace with your OpenAI API key
-openai.api_key = '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'
+client = OpenAI(
+    # defaults to os.environ.get("OPENAI_API_KEY")
+    api_key='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'
+)
 
 def query_openai(prompt, max_tokens=150):
-    response = openai.chat.completions.create(
-        model="text-davinci-003",
-        messages=prompt,
-        max_tokens=max_tokens,
-        temperature=0.7,
-        top_p=1,
-        n=1,
-        stop=None
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=prompt
     )
-    return response.choices[0].text.strip()
+    return response.choices[0].message.content
 
 # Test function
 def test_openai_query():
