@@ -62,6 +62,12 @@ def read_event_data():
         event['_id'] = str(event['_id'])  # Convert ObjectId to string
     return jsonify(json.loads(json_util.dumps(data)))
 
+# API Route to get events
+@app.route('/read/events', methods=['GET'])
+def get_events():
+    events = list(events_collection.find({}, {'_id': 0})) 
+    return jsonify(events)
+
 
 @app.route('/healthcheck')
 def healthcheck():
@@ -214,12 +220,6 @@ def get_form_item():
 client = MongoClient("mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 db = client['Event']
 events_collection = db['Event Data']
-
-# API Route to get events
-@app.route('/events', methods=['GET'])
-def get_events():
-    events = list(events_collection.find({}, {'_id': 0})) 
-    return jsonify(events)
     
 if __name__ == "__main__":
     app.run(debug=True)

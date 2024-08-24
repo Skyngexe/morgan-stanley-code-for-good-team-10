@@ -21,7 +21,7 @@ export default function AdminPage() {
 
   const fetchEvents = async () => {
     axios
-      .get("http://127.0.0.1:5000/events")
+      .get("http://127.0.0.1:5000/read/events")
       .then((response) => {
         console.log(response.data);
         setEvents(response.data);
@@ -32,7 +32,9 @@ export default function AdminPage() {
         return { error: error };
       });
   };
-  fetchEvents();
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   return (
     <div className="flex flex-col items-center">
@@ -67,17 +69,19 @@ export default function AdminPage() {
           )}
         </ul>
         {/* <div>{JSON.stringify(events)}</div> */}
-        <div>
-          {events && events.map((event, index) => (
-            <div key={index} className="border">
-              <strong>Name:</strong> {event.name} <br />
-              <strong>Location:</strong> {event.location} <br />
-              <strong>Start Date:</strong> {event.startDate} <br />
-              <strong>End Date:</strong> {event.endDate} <br />
-              <strong>Event Type:</strong> {event.eventType} <br />
-              <strong>Status:</strong> {event.status}
-            </div>
-          ))}
+        <h1 className="mt-12 text-2xl">Events</h1>
+        <div className="mt flex flex-col gap-y-4">
+          {events &&
+            events.map((event, index) => (
+              <div key={index} className="border">
+                <strong>Name:</strong> {event.name} <br />
+                <strong>Location:</strong> {event.location} <br />
+                <strong>Start Date:</strong> {event.startDate} <br />
+                <strong>End Date:</strong> {event.endDate} <br />
+                <strong>Event Type:</strong> {event.eventType} <br />
+                <strong>Status:</strong> {event.status}
+              </div>
+            ))}
         </div>
       </div>
     </div>

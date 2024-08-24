@@ -75,5 +75,6 @@ def get_form_and_resposes(formId):
     questions = {item['questionItem']['question']['questionId']: item['title']
                 for item in form['items'] if 'questionItem' in item}
     responses = form_service.forms().responses().list(formId=formId).execute()
+    print({"questions": questions, "responses": responses})
     return {"questions": questions, "responses": responses}
 
