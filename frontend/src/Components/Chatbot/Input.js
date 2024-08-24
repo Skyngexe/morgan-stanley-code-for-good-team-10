@@ -14,13 +14,14 @@ export default function Input({ onSend }) {
   };
 
   return (
-    <div className="input">
-      <form onSubmit={handleSend}>
+    <div className="input flex items-center">
+      <form onSubmit={handleSend} className="w-full flex flex-row items-center justify-between gap-x-2">
         <input
           type="text"
           onChange={handleInputChange}
           value={text}
           placeholder="Enter your message here"
+          className="w-full"
         />
         <button>
           <svg

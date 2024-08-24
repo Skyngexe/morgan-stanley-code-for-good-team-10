@@ -8,8 +8,7 @@ import Input from "./Input";
 
 import API from "./ChatbotAPI";
 
-import "./styles.css";
-// import Header from "./components/Header";
+import Header from "./Header";
 
 function Chatbot() {
   const [messages, setMessages] = useState([]);
@@ -38,8 +37,8 @@ function Chatbot() {
   };
 
   return (
-    <div className="chatbot mt-32">
-      {/* <Header /> */}
+    <div className="rounded-xl shadow-xl bg-[#f5f8fb] text-center flex flex-col w-[300px] overflow-hidden mt-32">
+      <Header />
       <Messages messages={messages} />
       <Input onSend={send} />
     </div>
