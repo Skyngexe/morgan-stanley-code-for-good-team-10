@@ -23,8 +23,9 @@ db_client = MongoClient(MONGO_URI)
 event_db = db_client[EVENT_DB]
 user_db = db_client[USER_DB]
 event_data = event_db['Event Data']
+event_details= event_db['Event Details']
 user_data = event_db['User Data']
-events_detail_collection = db['Event Details']
+events_detail_collection = event_db['Event Details']
 
 class UserRole(Enum):
     """
@@ -131,9 +132,35 @@ def create_new_event():
 @app.route('/read/event', methods=['GET'])
 def read_event_data():
     data = list(event_data.find({}))
+    event_details = list(events_detail_collection.find({}))
     for event in data:
-        event['_id'] = str(event['_id'])  # Convert ObjectId to string
-    return jsonify(json.loads(json_util.dumps(data)))
+            event['_id'] = str(event['_id'])
+        
+    for detail in event_details:
+        detail['_id'] = str(detail['_id'])
+
+        # Merge the two lists
+    merged_data = []
+    
+    for event in data:
+        # Create a copy of the event to avoid mutating the original
+        merged_event = event.copy()
+        
+        # Match with event details using eventId
+        event_id = event['eventId']['$numberInt'] if isinstance(event['eventId'], dict) else event['eventId']
+        detail = next((d for d in event_details if (d['eventId']['$numberInt'] if isinstance(d['eventId'], dict) else d['eventId']) == event_id), None)
+        
+        if detail:
+            # Merge fields from detail into merged_event
+            for key, value in detail.items():
+                if key not in merged_event:
+                    merged_event[key] = value
+                else:
+                    merged_event[f"{key}_detail"] = value
+        
+        merged_data.append(merged_event)
+
+    return jsonify(json.loads(json_util.dumps(merged_data)))
 
 
 @app.route('/healthcheck')
@@ -308,23 +335,14 @@ def get_responses_with_formId(formId):
     result = form_service.forms().responses().list(formId=formId).execute()
     return result
 
-@app.route('/response/form', methods=['GET'])
-def get_responses():
-    data = get_responses_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
+@app.route('/response/form/<formId>', methods=['GET'])
+def get_responses(formID):
+    data = get_responses_with_formId(formID)
     print(data)
     return {"data": data}
 
-# API Route to get events
-@app.route('/eventdata', methods=['GET'])
-def get_event_data():
-    events = list(event_data.find({}, {'_id': 0})) 
-    return jsonify(events)
+# write a function that gets data from event data and event details and merge them so frontend can use it 
 
-@app.route('/eventsdetails', methods=['GET'])
-def get_event_details():
-    events = list(events_detail_collection.find({}, {'_id': 0})) 
-    return jsonify(events)
-
-
+    
 if __name__ == "__main__":
     app.run(debug=True)
