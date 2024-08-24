@@ -7,6 +7,7 @@ import "./App.css";
 import AdminPage from "./Pages/AdminPage";
 import Header from "./Components/Header";
 import EventPage from "./Pages/EventPage";
+import ChatBot from "./Components/Chatbot/ChatBot";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/events" element={<EventPage />} />
           <Route path="/dashboard" element={<p>Dashboard Page</p>} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/chatbot" element={<ChatBot />} />
         </Routes>
       </div>
     </Router>
