@@ -10,6 +10,7 @@ import Header from "./Components/Header";
 import EventPage from "./Pages/EventPage";
 import LoginPage from "./Pages/LoginPage";
 import CreateAccountPage from "./Pages/CreateAccountPage";
+import ProfilePage from "./Pages/ProfilePage";
 
 import CardMenu from "./Components/Admin/admin-main-menu";
 import ViewEventTitle from "./Components/Admin/view-events-title";
@@ -85,6 +86,7 @@ function App() {
               }
             />
           </Route>
+          <Route path="profile" element={<ProfilePage />} />
         </Routes>
       </div>
     </Router>
