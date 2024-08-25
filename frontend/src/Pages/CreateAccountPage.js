@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import useStore from "../Components/secureStore";
 import axios from "axios";
+import LogoutButton from "../Components/Logout";
 
 function CreateAccountPage() {
   const email = useStore((state) => state.email);
@@ -50,7 +51,7 @@ function CreateAccountPage() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="mt-32 p-4 rounded container min-w-[300px] shadow-xl">
+      <div className="mt-32 mb-4 p-4 rounded container min-w-[300px] shadow-xl">
         <h1>Creating account for {email}</h1>
         <form className="flex flex-col items-start" onSubmit={handleSubmit}>
           <label className="flex items-center gap-x-4">
@@ -144,6 +145,7 @@ function CreateAccountPage() {
           <input type="submit" value="Create Account" />
         </form>
       </div>
+      <LogoutButton />
     </div>
   );
 }
