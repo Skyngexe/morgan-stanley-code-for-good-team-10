@@ -15,12 +15,7 @@ function Chatbot() {
 
   useEffect(() => {
     async function loadWelcomeMessage() {
-      setMessages([
-        <BotMessage
-          key="0"
-          fetchMessage={async () => await API.GetChatbotResponse("hi")}
-        />
-      ]);
+      setMessages();
     }
     loadWelcomeMessage();
   }, []);
