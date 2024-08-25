@@ -7,33 +7,20 @@ import EventCard from '../Events/EventCard';
 const EventList = () => {
   const [eventList, setEventList] = useState([]);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // const fetchData = async () => {
-  //   try {
-  //     const events = mockEventData;
-  //     console.log(events);
-  //     setEventList(events);
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/read/events");
+      const response = await axios.get("http://127.0.0.1:5000/read/event");
       const events = response.data;
       const today = new Date();
 
       const upcomingEvents = events
-        .filter((event) => new Date(event.endDate) > today)
-        .sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+        .filter((event) => new Date(event.endDate.$date) > today)
+        .sort((a, b) => new Date(a.endDate.$date) - new Date(b.endDate.$date));
       const pastEvents = events.filter(
-        (event) => new Date(event.endDate) < today
+        (event) => new Date(event.endDate.$date) < today
       );
 
-      setEventList(events);
+      setEventList(pastEvents);
       console.log("eventList:", eventList);
     } catch (error) {
       console.error("Error fetching data:", error);
