@@ -50,7 +50,7 @@ function App() {
   if (data.message === "User not found") {
     return <CreateAccountPage />;
   } else if (data.message !== "User found") {
-    return <div>Server Error</div>;
+    return <div>Server Error: {data.message}</div>;
   }
   setRole(data.user.role);
   console.log("role:", data.user.role);
