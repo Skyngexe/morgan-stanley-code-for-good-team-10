@@ -63,13 +63,17 @@ def get_user_by_google_id(id):
     # googleId: "111762572170626902982"
     # imageUrl: "https://lh3.googleusercontent.com/a/ACg8ocJF5-hBnR0E6OvQEDAIPHCqpMDW1D4F7x_Pjgk6nF6CtQOwlw=s96-c"
     # name: "CodeForGood"
-    user = user_data.find_one({"googleId": id})
-    if user:
-        # Convert ObjectId to string
-        user['_id'] = str(user['_id'])
-        return jsonify({"message": "User found", "user": user})
-    else:
-        return jsonify({"message": "User not found"})
+    try:
+        user = user_data.find_one({"googleId": id})
+        if user:
+            # Convert ObjectId to string
+            user['_id'] = str(user['_id'])
+            return jsonify({"message": "User found", "user": user})
+        else:
+            return jsonify({"message": "User not found"})
+    except Exception as e:
+        return jsonify({"message": str(e)})
+
 
 # 1. Create User
 @app.route('/write/user', methods=['POST'])
@@ -173,7 +177,7 @@ def create_new_event_and_form():
         print(new_event)
         event_data.insert_one(new_event)
         eventId = new_event['eventId']
-        create_gform(eventId)
+        create_feedback_form(eventId)
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -285,9 +289,9 @@ def store_event_feedback_link(feedback_url, event_id, gform_id):
         raise ValueError(f"Error fetching event: {str(e)}")
 
 
-# 9. Create Google Form with Event ID
+# 9. Create Feedback Google Form with Event ID
 @app.route('/create/form/<int:event_id>', methods=['POST'])
-def create_gform(event_id):
+def create_feedback_form(event_id):
     SCOPES = "https://www.googleapis.com/auth/forms.body"
     DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
 
@@ -304,7 +308,6 @@ def create_gform(event_id):
         discoveryServiceUrl=DISCOVERY_DOC,
         static_discovery=False,
     )
-
 
     try:
         event_data_for_gform = fetch_event_data(event_id)
