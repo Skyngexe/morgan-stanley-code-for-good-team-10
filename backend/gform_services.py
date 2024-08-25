@@ -138,7 +138,7 @@ def create_registration_form(new_event):
             {
                 "updateFormInfo": {
                     "info": {
-                        "description": f"Description: {new_event['descriptions']}\nLocation: {new_event['location']}\nDate: {new_event['startDate']} - {new_event['endDate']}\nVolunteers needed: {new_event['volunteer_Quota']}\nParticipants needed: {new_event['participant_Quota']}"
+                        "description": f"Description: {new_event['descriptions']}\nLocation: {new_event['location']}\nDate: {new_event['startDate']} - {new_event['endDate']}\nVolunteers needed: {new_event['volunteer_Quota']}\nParticipants needed: {new_event['participant_Quota']}\n Please use the email u sign up for your Zubin account"
                     },
                     "updateMask": "description"
                 }
