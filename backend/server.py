@@ -260,15 +260,6 @@ def fetch_event_data_with_formId(formId):
     except Exception as e:
         raise ValueError(f"Error fetching event: {str(e)}")
     
-    
-def extract_date(datetime):
-    start_date = datetime.fromisoformat(str(datetime)) 
-    return start_date.strftime("%Y-%m-%d")
-
-def extract_time(datetime):
-    time = datetime.fromisoformat(str(datetime)) 
-    return time.strftime("%H:%M:%S")
-
 def store_event_feedback_link(feedback_url, event_id, gform_id):
     try:
         event = event_data.find_one({"eventId": event_id})
@@ -357,7 +348,7 @@ def get_form(formId):
 
 
 # 11. Return Google Form Responses with Form ID
-@app.route('/response/form/<formId>', methods=['GET'])
+@app.route('/form/response/<formId>', methods=['GET'])
 def get_responses(formId):
     data = get_responses_with_formId(formId)
     print(data)
