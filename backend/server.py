@@ -7,7 +7,7 @@ from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 from flask_cors import CORS
-from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, registration_form_questions, create_registration_form, transform_event_data_to_feedback_questions
+from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, create_registration_and_feedback_form
 from bson.objectid import ObjectId
 
 app = Flask(__name__)
@@ -170,14 +170,18 @@ def get_events():
 def create_new_event_and_form():
     try:
         new_event = request.json  # Access JSON data from the request object
-        registration_form = create_registration_form(new_event)
-        new_event['form_Id'] = registration_form["form_Id"]
-        new_event['registrationURL'] = registration_form["registrationUrl"]
+        new_event["startDate"]= datetime.strptime(new_event["startDate"], "%Y-%m-%dT%H:%M") 
+        new_event["endDate"]= datetime.strptime(new_event["endDate"], "%Y-%m-%dT%H:%M") 
+        forms = create_registration_and_feedback_form(new_event)
+        new_event['form_Id'] = forms["form_Id"]
+        new_event['registrationURL'] = forms["registrationURL"]
+        new_event['feedback_form_Id'] = forms["feedback_form_Id"]
+        new_event['feedbackURL'] = forms["feedbackURL"]
+
         event_details.insert_one(new_event)
         print(new_event)
         event_data.insert_one(new_event)
-        eventId = new_event['eventId']
-        create_feedback_form(eventId)
+        
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -213,7 +217,7 @@ def update_event_with_id(event_id):
     return jsonify({"message": "Event updated successfully"}), 200
     
     
-# 7. Delete Single Event Information with Event ID
+# 7. Delete Single Event with Event ID
 @app.route('/delete/event/<event_id>', methods=['DELETE'])
 def delete_event_with_id(event_id):
     try:
@@ -289,59 +293,59 @@ def store_event_feedback_link(feedback_url, event_id, gform_id):
         raise ValueError(f"Error fetching event: {str(e)}")
 
 
-# 9. Create Feedback Google Form with Event ID
-@app.route('/create/form/<int:event_id>', methods=['POST'])
-def create_feedback_form(event_id):
-    SCOPES = "https://www.googleapis.com/auth/forms.body"
-    DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+# # 9. Create Feedback Google Form with Event ID
+# @app.route('/create/form/<int:event_id>', methods=['POST'])
+# def create_feedback_form(event_id):
+#     SCOPES = "https://www.googleapis.com/auth/forms.body"
+#     DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
 
-    store = file.Storage("token.json")
-    creds = None
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets("credentials.json", SCOPES)
-        creds = tools.run_flow(flow, store)
+#     store = file.Storage("token.json")
+#     creds = None
+#     if not creds or creds.invalid:
+#         flow = client.flow_from_clientsecrets("credentials.json", SCOPES)
+#         creds = tools.run_flow(flow, store)
 
-    form_service = discovery.build(
-        "forms",
-        "v1",
-        http=creds.authorize(Http()),
-        discoveryServiceUrl=DISCOVERY_DOC,
-        static_discovery=False,
-    )
+#     form_service = discovery.build(
+#         "forms",
+#         "v1",
+#         http=creds.authorize(Http()),
+#         discoveryServiceUrl=DISCOVERY_DOC,
+#         static_discovery=False,
+#     )
 
-    try:
-        event_data_for_gform = fetch_event_data(event_id)
-        event_start_time = extract_time(event_data_for_gform['startDate'])
-        event_end_time = extract_time(event_data_for_gform['endDate'])
-        event_date = extract_date(event_data_for_gform['startDate'])
-        # Request body for creating a form
-        NEW_FORM = {
-            "info": {
-                "title": f" Feedback form on {event_data_for_gform['name']} that is hosted on f{event_date} from {event_start_time} to {event_end_time}"
-            }
-        }
+#     try:
+#         event_data_for_gform = fetch_event_data(event_id)
+#         event_start_time = extract_time(event_data_for_gform['startDate'])
+#         event_end_time = extract_time(event_data_for_gform['endDate'])
+#         event_date = extract_date(event_data_for_gform['startDate'])
+#         # Request body for creating a form
+#         NEW_FORM = {
+#             "info": {
+#                 "title": f" Feedback form on {event_data_for_gform['name']} that is hosted on f{event_date} from {event_start_time} to {event_end_time}"
+#             }
+#         }
 
-        # Creates the initial form
-        result = form_service.forms().create(body=NEW_FORM).execute()
+#         # Creates the initial form
+#         result = form_service.forms().create(body=NEW_FORM).execute()
 
-        # Adds the questions based on event data
-        question_setting = (
-            form_service.forms()
-            .batchUpdate(formId=result["formId"], body=transform_event_data_to_feedback_questions(event_data_for_gform))  # Update function
-            .execute()
-        )
+#         # Adds the questions based on event data
+#         question_setting = (
+#             form_service.forms()
+#             .batchUpdate(formId=result["formId"], body=transform_event_data_to_feedback_questions(event_data_for_gform))  # Update function
+#             .execute()
+#         )
 
-        # Prints the result to show the question has been added
-        get_result = form_service.forms().get(formId=result["formId"]).execute()
-        gform_url = get_result.get("responderUri")
-        gform_id = get_result.get("formId")
+#         # Prints the result to show the question has been added
+#         get_result = form_service.forms().get(formId=result["formId"]).execute()
+#         gform_url = get_result.get("responderUri")
+#         gform_id = get_result.get("formId")
 
-        if gform_url:
-            store_event_feedback_link(gform_url, event_id, gform_id)
-        return get_result
+#         if gform_url:
+#             store_event_feedback_link(gform_url, event_id, gform_id)
+#         return get_result
     
-    except ValueError as e:
-        return {"error": str(e)}, 404 
+#     except ValueError as e:
+#         return {"error": str(e)}, 404 
 
 
 # 10. Return Google Form with Form ID
