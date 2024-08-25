@@ -276,12 +276,16 @@ def get_responses(formId):
     print(data)
     return {"data": data}
 
-@app.route('/response/regform/save/<formId>', methods=['GET'])
-def save_geresponses(formId):
-    data = get_responses_with_formId(formId)
-    print(data)
-    save_registration_responses(data, formId)
-    return {"data": data}
+@app.route('/response/save/regform', methods=['GET'])
+def save_geresponses():
+    events = event_data.find({})
+    for event in events:
+        formId = event.get('form_Id')
+        if formId:
+            data = get_responses_with_formId(formId)
+            print(data)
+            save_registration_responses(data, formId)
+    return {"message": "all registration info saved"}
 
 @app.route('/form/get/<formId>', methods=['GET'])
 def get_form(formId):
@@ -382,46 +386,48 @@ def save_feedback(formId):
 def save_registration_responses(data, formId):
     event = fetch_event_data_with_formId(formId)
     try:
-        for response in data['responses']:
-            email = None
-            role = None
-            phone_number = None
+        responses = data.get('responses')
+        if responses:
+            for response in data['responses']:
+                email = None
+                role = None
+                phone_number = None
 
-            for question_id, answer_data in response['answers'].items():
-                value = answer_data['textAnswers']['answers'][0]['value']
-                if "@" in value:
-                    email = value
-                elif value.isdigit():
-                    phone_number = value
-                else:
-                    role = value
-
-            if event:
-                register = None
-                if role == 'Volunteer':
-                    register = "registered_volunteer"
-                else:
-                    register = "registered_participants"
-
-                existing_event = event_data.find_one({'form_Id': formId})
-                user = user_data.find_one({
-                            '$or': [
-                                {'email': email},
-                                {'phone': phone_number}
-                            ]
-                        })
-                
-                if user:
-                    if existing_event:
-                        updateUserDataWithRegisteredEvent(existing_event, user)
-                        updateEventRegisteredDetails(register, formId, email, phone_number)
+                for question_id, answer_data in response['answers'].items():
+                    value = answer_data['textAnswers']['answers'][0]['value']
+                    if "@" in value:
+                        email = value
+                    elif value.isdigit():
+                        phone_number = value
                     else:
-                        return {"message": "Event with the specified form_Id not found."}, 404
-                else:
-                    if existing_event:
-                        updateEventRegisteredDetails(register, formId, email, phone_number)
+                        role = value
+
+                if event:
+                    register = None
+                    if role == 'Volunteer':
+                        register = "registered_volunteer"
                     else:
-                        return {"message": "Event with the specified form_Id not found."}, 404
+                        register = "registered_participants"
+
+                    existing_event = event_data.find_one({'form_Id': formId})
+                    user = user_data.find_one({
+                                '$or': [
+                                    {'email': email},
+                                    {'phone': phone_number}
+                                ]
+                            })
+                    
+                    if user:
+                        if existing_event:
+                            updateUserDataWithRegisteredEvent(existing_event, user)
+                            updateEventRegisteredDetails(register, formId, email, phone_number)
+                        else:
+                            return {"message": "Event with the specified form_Id not found."}, 404
+                    else:
+                        if existing_event:
+                            updateEventRegisteredDetails(register, formId, email, phone_number)
+                        else:
+                            return {"message": "Event with the specified form_Id not found."}, 404
 
         return {"message": "Feedback URL added successfully."}, 200
     
@@ -447,7 +453,7 @@ def updateUserDataWithRegisteredEvent(existing_event, user):
             {'googleId': google_id},
             update_query
         )
-        
+
 def serialize_user(user):
     # Convert ObjectId to string for serialization
     user['_id'] = str(user['_id'])
