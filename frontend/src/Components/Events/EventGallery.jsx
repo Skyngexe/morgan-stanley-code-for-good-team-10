@@ -2,20 +2,21 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container } from '@mui/material';
 import EventCard from './EventCard'; 
+import EventDetailDialog from './EventDetailDIalog';
 
-function EventGallery(data) {
+function EventGallery() {
   const [eventDataList, setEventDataList] = useState([]);
   const [upcomingEventsList, setUpcomingEventsList] = useState([]);
   const [pastEventsList, setPastEventsList] = useState([]);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/eventdata');
+      const response = await axios.get('http://127.0.0.1:5000/read/event');
       const events = response.data;
       const today = new Date();
 
-      const upcomingEvents = events.filter(event => new Date(event.startDate) > today);
-      const pastEvents = events.filter(event => new Date(event.endDate) < today);
+      const upcomingEvents = events.filter(event => new Date(event.endDate.$date) > today);
+      const pastEvents = events.filter(event => new Date(event.endDate.$date) < today);
 
       setEventDataList(events);
       setUpcomingEventsList(upcomingEvents);
@@ -37,7 +38,7 @@ return (
             {upcomingEventsList && upcomingEventsList.length > 0 ? (
                 <div className="grid grid-cols-4 gap-6">
                     {upcomingEventsList.slice(0, 4).map((event, index) => (
-                        <EventCard key={index} event={event} />
+                        <EventCard key={index} event={event}/>
                     ))}
                 </div>
             ) : (
@@ -52,7 +53,7 @@ return (
                 <div className="grid grid-cols-4 gap-6">
                     {pastEventsList.slice(0, 4).map((event, index) => (
                         <EventCard key={index} event={event} />
-                    ))}
+                      ))}
                 </div>
             ) : (
                 <div>No events found.</div>

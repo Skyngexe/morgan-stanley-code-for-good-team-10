@@ -18,16 +18,18 @@ from datetime import datetime
 MONGO_URI = "mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 EVENT_DB = "Event"
 USER_DB = 'User'
-
+FEEDBACK_DB = 'Feedback'
 # Connect to MongoDB
 db_client = MongoClient(MONGO_URI)
 event_db = db_client[EVENT_DB]
 user_db = db_client[USER_DB]
+feedback_db = db_client[FEEDBACK_DB]
 event_data = event_db['Event Data']
 user_data = user_db['User Data']
 event_details= event_db['Event Details']
 # user_data = event_db['User Data']
 events_detail_collection = event_db['Event Details']
+feedback_collection = feedback_db['Events Feedback']
 
 class UserRole(Enum):
     """
@@ -110,46 +112,6 @@ def create_new_user():
         return jsonify({'message': 'User data inserted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-
-# API Route to create event
-@app.route('/write/event', methods=['POST'])
-def create_new_event():
-    """
-    Create a new event and insert the event data into the database.
-
-    Expects JSON data in the request body with the following structure:
-    
-    {
-        "name": "Weekly Chai Gathering for EM Women",
-        "description": "A Weekly gathering for Women, join us if interested!",
-        "imageURL": "https://scontent-hkg1-2.xx.fbcdn.net/v/t39.30808-6/453646501_505226555…",
-        "startDate": "24 August 2024",
-        "endDate": "20 December 2024",
-        "volunteer_Quota": 5,
-        "participant_Quota": 20,
-        "eventType": "women",
-        "videoURL": "https://www.youtube.com/watch?v=SlDJUL7lMCk",
-        "status": "full",
-        "location": "Singapore",
-        "fee": "free"
-    }
-
-    Returns:
-        dict: A dictionary containing a success message if the event data is inserted successfully.
-
-    Raises:
-        400: If there are any errors during the event creation process.
-
-    Notes:
-        - Make sure to provide the required fields in the JSON data for the new event.
-    """
-    try:
-        new_event = request.json  # Access JSON data from the request object
-        print(new_event)
-        event_data.insert_one(new_event)
-        return jsonify({'message': 'Event data inserted successfully'}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
     
 # API Route to get single event
 @app.route('/read/event', methods=['GET'])
@@ -196,18 +158,15 @@ def get_events():
 def create_new_event_and_form():
     try:
         new_event = request.json  # Access JSON data from the request object
-        form = create_registration_form(new_event)
-        new_event['form_Id'] = form["form_Id"]
-        new_event['registrationURL'] = form["registrationUrl"]
+        registration_form = create_registration_form(new_event)
+        new_event['form_Id'] = registration_form["form_Id"]
+        new_event['registrationURL'] = registration_form["registrationUrl"]
+        event_details.insert_one(new_event)
         print(new_event)
         event_data.insert_one(new_event)
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-    
-@app.route('/healthcheck')
-def healthcheck():
-    return 'Server is up and running!'
 
 @app.route('/update', methods=['PUT'])
 def update_event_data():
@@ -225,6 +184,17 @@ def fetch_event_data(event_id):
             raise ValueError("Event not found.")
     except Exception as e:
         raise ValueError(f"Error fetching event: {str(e)}")
+
+def fetch_event_data_with_formId(formId):
+    try:
+        event = event_data.find_one({"form_Id": formId})
+        if event:
+            return event  # Return the event data as a dictionary
+        else:
+            raise ValueError("Event not found.")
+    except Exception as e:
+        raise ValueError(f"Error fetching event: {str(e)}")
+    
     
 def extract_date(datetime):
     start_date = datetime.fromisoformat(str(datetime)) 
@@ -239,10 +209,15 @@ def store_event_feedback_link(feedback_url, event_id, gform_id):
         event = event_data.find_one({"eventId": event_id})
 
         if event:
+           if event:
             event_data.update_one(
                 {"eventId": event_id},
-                {"$set": {"feedbackURL": feedback_url}},
-                {"$set": {"formID": gform_id}}
+                {
+                    "$set": {
+                        "feedbackURL": feedback_url,
+                        "feedback_form_id": gform_id
+                    }
+                }
             )
             return {"message": "Feedback URL added successfully."}, 200
         
@@ -274,7 +249,7 @@ def create_gform(event_id):
 
 
     try:
-        event_data_for_gform = fetch_event_data(event_id) 
+        event_data_for_gform = fetch_event_data(event_id)
         event_start_time = extract_time(event_data_for_gform['startDate'])
         event_end_time = extract_time(event_data_for_gform['endDate'])
         event_date = extract_date(event_data_for_gform['startDate'])
@@ -306,27 +281,6 @@ def create_gform(event_id):
     
     except ValueError as e:
         return {"error": str(e)}, 404 
-    
-def get_responses_with_formId(formId): 
-    SCOPES = "https://www.googleapis.com/auth/forms.responses.readonly"
-    DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
-
-    store = file.Storage("token.json")
-    creds = None
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets("credentials.json", SCOPES)
-        creds = tools.run_flow(flow, store)
-
-    form_service = discovery.build(
-        "forms",
-        "v1",
-        http=creds.authorize(Http()),
-        discoveryServiceUrl=DISCOVERY_DOC,
-        static_discovery=False,
-    )
-
-    result = form_service.forms().responses().list(formId=formId).execute()
-    return result
 
 @app.route('/response/form/<formId>', methods=['GET'])
 def get_responses(formId):
@@ -334,16 +288,22 @@ def get_responses(formId):
     print(data)
     return {"data": data}
 
-@app.route('/form/get', methods=['GET'])
-def get_form():
-    data = get_form_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
+@app.route('/response/regform/save/<formId>', methods=['GET'])
+def save_geresponses(formId):
+    data = get_responses_with_formId(formId)
+    print(data)
+    save_registration_responses(data, formId)
+    return {"data": data}
+
+@app.route('/form/get/<formId>', methods=['GET'])
+def get_form(formId):
+    data = get_form_with_formId(formId)
     print(data)
     return {"data": data}
 
 # API to get form questions and responses
-@app.route('/form/item', methods=['GET'])
-def get_form_item():
-    formId = "1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo"
+@app.route('/form/item/<formId>', methods=['GET'])
+def get_form_item(formId):
     data = get_form_and_resposes(formId)
     return data
 
@@ -353,16 +313,124 @@ def get_event_data():
     events = list(event_data.find({}, {'_id': 0})) 
     return jsonify(events)
 
+
 # API Route to get event details
-@app.route('/eventsdetails', methods=['GET'])
+@app.route('/eventdetails', methods=['GET'])
 def get_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
 
-def save_responses():
-    pass
+
+# API route to get the most updated feedback on an event based on formId
+@app.route('/feedback/show/<formId>', methods=['GET'])
+def get_gform_feedback(formId):
+    save_feedback(formId)
+    feedback = list(feedback_collection.find({'form_Id': formId}))
+    for item in feedback:
+        item['_id'] = str(item['_id'])
+    return jsonify(feedback)
+    
+# save feedback from gform based on formId to Feedback.Event Feedback, one document corresponds to one feedback
+def save_feedback(formId):
+    event = get_form_and_resposes(formId)
+    
+    if not event:
+        return {"message": "Event with the specified form_Id not found."}, 404
+
+    responseIds = set()  # To keep track of processed responseIds
+
+    try:
+        for response in event.get('responses', {}).get('responses', []):
+            responseId = response.get('responseId')
+            
+            # Skip previously processed responseIds
+            if responseId in responseIds:
+                continue
+            
+            feedback = None
+            rating = None
+
+            for question_id, answer_data in response.get('answers', {}).items():
+                value = answer_data.get('textAnswers', {}).get('answers', [{}])[0].get('value', '')
+
+                if value.isdigit():
+                    if int(value) in [1, 2, 3, 4, 5]:
+                        rating = value
+                else:
+                    feedback = value
+
+            existing_feedback = feedback_collection.find_one({'responseId': responseId})
+            if not existing_feedback:
+                new_document = {'responseId': responseId, 'form_Id': formId, 'feedback': feedback, 'rating': rating}
+                feedback_collection.insert_one(new_document)
+
+            responseIds.add(responseId)  # Add processed responseId to the set
+
+        return {"message": "Feedback saved successfully"}
+
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+# function to save registration reponses (phone number & email) into the event_data based on formId and role 
+def save_registration_responses(data, formId):
+    event = fetch_event_data_with_formId(formId)
+    try:
+        for response in data['responses']:
+            email = None
+            role = None
+            phone_number = None
+
+            for question_id, answer_data in response['answers'].items():
+                value = answer_data['textAnswers']['answers'][0]['value']
+                if "@" in value:
+                    email = value
+                elif value.isdigit():
+                    phone_number = value
+                else:
+                    role = value
+
+            if event:
+                register = None
+                if role == 'Volunteer':
+                    register = "registered_volunteer"
+                else:
+                    register = "registered_participants"
+
+                existing_event = event_data.find_one({'form_Id': formId})
+
+                if existing_event:
+                    existing_combination = event_data.find_one({
+                        "form_Id": formId,
+                        register: {
+                            "$elemMatch": {
+                                "email": email,
+                                "phone_number": phone_number
+                            }
+                        }
+                    })
+
+                    if not existing_combination:
+                        event_data.update_one(
+                            {"form_Id": formId},
+                            {
+                                "$push": {
+                                    register: {
+                                        "email": email,
+                                        "phone_number": phone_number
+                                    }
+                                }
+                            }
+                        )
+                else:
+                    # If the event with the given form_Id doesn't exist, you can return an error message or take appropriate action
+                    return {"message": "Event with the specified form_Id not found."}, 404
+
+        return {"message": "Feedback URL added successfully."}, 200
+    except ValueError as e:
+        return {"error": str(e)}, 404 
 
 # find reponses in gform and update participants list 
+
 
     
 if __name__ == "__main__":
