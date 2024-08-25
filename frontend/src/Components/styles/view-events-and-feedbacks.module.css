@@ -14,7 +14,7 @@ h1 {
   flex-wrap: wrap;
 }
 
-.container-items {
+.container_items {
   padding: 5vh;
   height: 40vh;
   width: 40vh;
@@ -24,7 +24,7 @@ h1 {
   justify-content: space-between;
 }
 
-.button-container {
+.button_container {
   padding: 2.5vh;
   display: flex;
   justify-content: space-evenly;
@@ -44,7 +44,7 @@ h1 {
   z-index: 1;
 }
 
-.modal-content {
+.modal_content {
   display: flex;
   flex-direction: column;
   align-items: center;

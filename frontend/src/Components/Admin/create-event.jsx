@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/create-event.module.css";
+import styles from "../styles/create-event.module.css";
 
 const CreateEvent = () => {
     const [eventName, setEventName] = useState("");
@@ -54,10 +54,10 @@ const CreateEvent = () => {
     };
 
     return (
-        <div className="app">
+        <div className={styles.app}>
             <h1>Create Event</h1>
-            <div className="form-container">
-                <div className="event-form">
+            <div className={styles.form_container}>
+                <div className={styles.event_form}>
                     <input type="text" placeholder="Event Name" value={eventName} onChange={EventNameUpdate} />
                     <input type="date" placeholder="Start Date" value={startDate} onChange={StartDateUpdate} />
                     <input type="date" placeholder="End Date" value={endDate} onChange={EndDateUpdate} />
@@ -68,7 +68,6 @@ const CreateEvent = () => {
                     <button className="create-btn" onClick={CreateEvent}>Create Event</button>
                 </div>
             </div>
-           
         </div>
     );
 };

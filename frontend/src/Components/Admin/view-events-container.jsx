@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Modal from "./update-events-modal";
+import styles from "../styles/view-events-and-feedbacks.module.css"
 
 function Container() {
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -74,26 +75,26 @@ function Container() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="container">
+      <div className={styles.container}>
         {eventList.length > 0 ? (
           eventList.map((event) => (
-            <div key={event.ID} className="container-items">
+            <div key={event.ID} className={styles.container_items}>
               <h3>{event.Name}</h3>
-              <div className="info-container">
+              <div className={styles.info_container}>
                 <div>Location: {event.Location}</div>
                 <div>Start Date: {event["Start Date"]}</div>
                 <div>End Date: {event["End Date"]}</div>
                 <div>Type: {event["Event Type"]}</div>
               </div>
-              <div className="button-container">
+              <div className={styles.button_container}>
                 <button
-                  className="event-button"
+                  className={styles.event_button}
                   onClick={() => handleUpdate(event)}
                 >
                   Update Event
                 </button>
                 <button
-                  className="event-button"
+                  className={styles.event_button}
                   onClick={() => handleDelete(event.ID)}
                 >
                   Delete Event

@@ -4,6 +4,7 @@
   justify-content: center;
   align-items: center;
 } */
+
 .app {
   max-width: 800px;
   margin: 144px auto;
@@ -15,19 +16,19 @@ h1 {
   margin-bottom: 20px;
 }
 
-.form-container {
+.form_container {
   display: flex;
 
 }
 
-.event-form {
+.event_form {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.input-container {
+.input_container {
   margin-bottom: 20px;
 }
 
@@ -38,7 +39,7 @@ input {
   box-sizing: border-box;
 }
 
-.create-btn {
+.create_btn {
   padding: 8px 16px;
   background-color: #f9f9f9;
   color: #333;
@@ -49,7 +50,7 @@ input {
 }
 
 
-.event-item {
+.event_item {
   width: calc(33.33% - 20px);
   margin: 10px;
   padding: 10px;
@@ -58,10 +59,10 @@ input {
   border-radius: 5px;
 }
 
-.event-item h2 {
+.event_item h2 {
   margin-top: 0;
 }
 
-.event-item p {
+.event_item p {
   margin: 5px 0;
 }
