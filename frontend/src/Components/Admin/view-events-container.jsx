@@ -2,63 +2,64 @@ import React, { useState, useEffect } from "react";
 import Modal from "./update-events-modal";
 import styles from "../styles/view-events-and-feedbacks.module.css";
 import axios from "axios";
+import EventUpdateForm from "./EventUpdateForm";
 
-const dummy_data = [
-  {
-    ID: "A1",
-    Name: "Tung Chung Chai Gathering - Art with Tissue",
-    Location: "City Game",
-    "Start Date": "20 August 2024, 10 PM",
-    "End Date": "20 August 2024, 11PM",
-    "Event Type": "Women",
-    Status: "Available",
-  },
-  {
-    ID: "A2",
-    Name: "SEN Centre Help",
-    Location: "Hong Kong",
-    "Start Date": "10 August 2024",
-    "End Date": "27 December 2024",
-    "Event Type": "Children",
-    Status: "Available",
-  },
-  {
-    ID: "A3",
-    Name: "Chai Gathering for EM Ladies - Potluck Party",
-    Location: "Zubin's Family Centre",
-    "Start Date": "23 August 2024, 10AM",
-    "End Date": "23 August",
-    "Event Type": "Children",
-    Status: "Available",
-  },
-  {
-    ID: "A4",
-    Name: "Tung Chung Chai Gathering - Art with Tissue",
-    Location: "City Game",
-    "Start Date": "20 August 2024, 10 PM",
-    "End Date": "20 August 2024, 11PM",
-    "Event Type": "Women",
-    Status: "Available",
-  },
-  {
-    ID: "A5",
-    Name: "SEN Centre Help",
-    Location: "Hong Kong",
-    "Start Date": "10 August 2024",
-    "End Date": "27 December 2024",
-    "Event Type": "Children",
-    Status: "Available",
-  },
-  {
-    ID: "A6",
-    Name: "Chai Gathering for EM Ladies - Potluck Party",
-    Location: "Zubin's Family Centre",
-    "Start Date": "23 August 2024, 10AM",
-    "End Date": "23 August",
-    "Event Type": "Children",
-    Status: "Available",
-  },
-];
+// const dummy_data = [
+//   {
+//     ID: "A1",
+//     Name: "Tung Chung Chai Gathering - Art with Tissue",
+//     Location: "City Game",
+//     "Start Date": "20 August 2024, 10 PM",
+//     "End Date": "20 August 2024, 11PM",
+//     "Event Type": "Women",
+//     Status: "Available",
+//   },
+//   {
+//     ID: "A2",
+//     Name: "SEN Centre Help",
+//     Location: "Hong Kong",
+//     "Start Date": "10 August 2024",
+//     "End Date": "27 December 2024",
+//     "Event Type": "Children",
+//     Status: "Available",
+//   },
+//   {
+//     ID: "A3",
+//     Name: "Chai Gathering for EM Ladies - Potluck Party",
+//     Location: "Zubin's Family Centre",
+//     "Start Date": "23 August 2024, 10AM",
+//     "End Date": "23 August",
+//     "Event Type": "Children",
+//     Status: "Available",
+//   },
+//   {
+//     ID: "A4",
+//     Name: "Tung Chung Chai Gathering - Art with Tissue",
+//     Location: "City Game",
+//     "Start Date": "20 August 2024, 10 PM",
+//     "End Date": "20 August 2024, 11PM",
+//     "Event Type": "Women",
+//     Status: "Available",
+//   },
+//   {
+//     ID: "A5",
+//     Name: "SEN Centre Help",
+//     Location: "Hong Kong",
+//     "Start Date": "10 August 2024",
+//     "End Date": "27 December 2024",
+//     "Event Type": "Children",
+//     Status: "Available",
+//   },
+//   {
+//     ID: "A6",
+//     Name: "Chai Gathering for EM Ladies - Potluck Party",
+//     Location: "Zubin's Family Centre",
+//     "Start Date": "23 August 2024, 10AM",
+//     "End Date": "23 August",
+//     "Event Type": "Children",
+//     Status: "Available",
+//   },
+// ];
 
 function Container() {
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -74,6 +75,7 @@ function Container() {
       // const pastEvents = events.filter(event => new Date(event.endDate.$date) < today);
 
       setEventList(events);
+      console.log("eventList:", eventList);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -88,10 +90,29 @@ function Container() {
     setShowModal(true);
   };
 
-  const handleDelete = (eventID) => {
-    // Filter out the event with the specified ID
-    const updatedEvents = eventList.filter((event) => event.ID !== eventID);
-    setEventList(updatedEvents);
+  const handleDelete = async (event) => {
+    try {
+      const response = await axios.delete(
+        `http://127.0.0.1:5000/delete/event/${event._id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      alert("Event deleted successfully");
+      window.location.reload();
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data.error);
+      } else {
+        console.error("Error deleting event:", error.message);
+      }
+    }
+    // // Filter out the event with the specified ID
+    // const updatedEvents = eventList.filter((event) => event.ID !== eventID);
+    // setEventList(updatedEvents);
   };
 
   return (
@@ -116,11 +137,17 @@ function Container() {
                 </button>
                 <button
                   className={styles.event_button}
-                  onClick={() => handleDelete(event.ID)}
+                  onClick={() => handleDelete(event)}
                 >
                   Delete Event
                 </button>
                 {/* {showModal && <Modal event={selectedEvent} />} */}
+                {showModal && event === selectedEvent && (
+                  <EventUpdateForm
+                    data={selectedEvent}
+                    setShowModal={setShowModal}
+                  />
+                )}
               </div>
             </div>
           ))

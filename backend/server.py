@@ -155,7 +155,9 @@ def read_event_data():
 # 4. Return All Events
 @app.route('/read/events', methods=['GET'])
 def get_events():
-    events = list(event_data.find({}, {'_id': 0})) 
+    events = list(event_data.find()) 
+    for event in events:
+        event['_id'] = str(event['_id'])  
     return jsonify(events)
 
 
@@ -191,6 +193,8 @@ def get_event_details():
 @app.route('/update/event/<event_id>', methods=['PUT'])
 def update_event_with_id(event_id):
     update_data = request.json
+    if '_id' in update_data:
+        del update_data['_id']  # Remove _id from update_data to avoid modifying the immutable field
     event_object_id = ObjectId(event_id)
     result = event_data.update_one(
         {"_id": event_object_id},
