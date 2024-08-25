@@ -421,6 +421,18 @@ def get_form_item(formId):
     data = get_form_and_resposes(formId)
     return data
 
+# API Route to get events
+@app.route('/eventdata', methods=['GET'])
+def get_event_data():
+    events = list(event_data.find({}, {'_id': 0})) 
+    return jsonify(events)
+
+
+# API Route to get event details
+@app.route('/eventdetails', methods=['GET'])
+def get_event_details():
+    events = list(events_detail_collection.find({}, {'_id': 0})) 
+    return jsonify(events)
 
 # 13. Save Feedbacks from Google Form and Return Feedbacks with Form ID
 @app.route('/feedback/<formId>', methods=['GET'])
