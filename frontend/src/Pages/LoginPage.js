@@ -19,7 +19,7 @@ function LoginPage() {
     }, []);
 
     return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center mt-32">
             <LoginButton />
             {/* <LogoutButton /> */}
         </div>

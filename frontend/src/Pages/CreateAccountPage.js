@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useStore from "../Components/secureStore";
 import axios from "axios";
-import LogoutButton from "../Components/Logout";
+import LoginButton from "../Components/Login";
 
 function CreateAccountPage() {
   const email = useStore((state) => state.email);
@@ -145,7 +145,7 @@ function CreateAccountPage() {
           <input type="submit" value="Create Account" />
         </form>
       </div>
-      <LogoutButton />
+      <LoginButton />
     </div>
   );
 }
