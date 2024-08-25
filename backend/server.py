@@ -25,6 +25,8 @@ event_db = db_client[EVENT_DB]
 user_db = db_client[USER_DB]
 event_data = event_db['Event Data']
 user_data = user_db['User Data']
+event_details= event_db['Event Details']
+user_data = event_db['User Data']
 events_detail_collection = event_db['Event Details']
 
 class UserRole(Enum):
@@ -153,9 +155,35 @@ def create_new_event():
 @app.route('/read/event', methods=['GET'])
 def read_event_data():
     data = list(event_data.find({}))
+    event_details = list(events_detail_collection.find({}))
     for event in data:
-        event['_id'] = str(event['_id'])  # Convert ObjectId to string
-    return jsonify(json.loads(json_util.dumps(data)))
+            event['_id'] = str(event['_id'])
+        
+    for detail in event_details:
+        detail['_id'] = str(detail['_id'])
+
+        # Merge the two lists
+    merged_data = []
+    
+    for event in data:
+        # Create a copy of the event to avoid mutating the original
+        merged_event = event.copy()
+        
+        # Match with event details using eventId
+        event_id = event['eventId']['$numberInt'] if isinstance(event['eventId'], dict) else event['eventId']
+        detail = next((d for d in event_details if (d['eventId']['$numberInt'] if isinstance(d['eventId'], dict) else d['eventId']) == event_id), None)
+        
+        if detail:
+            # Merge fields from detail into merged_event
+            for key, value in detail.items():
+                if key not in merged_event:
+                    merged_event[key] = value
+                else:
+                    merged_event[f"{key}_detail"] = value
+        
+        merged_data.append(merged_event)
+
+    return jsonify(json.loads(json_util.dumps(merged_data)))
 
 # API Route to get all events
 @app.route('/read/events', methods=['GET'])
@@ -206,14 +234,15 @@ def extract_time(datetime):
     time = datetime.fromisoformat(str(datetime)) 
     return time.strftime("%H:%M:%S")
 
-def store_event_feedback_link(feedback_url, event_id):
+def store_event_feedback_link(feedback_url, event_id, gform_id):
     try:
         event = event_data.find_one({"eventId": event_id})
 
         if event:
             event_data.update_one(
                 {"eventId": event_id},
-                {"$set": {"feedbackURL": feedback_url}}
+                {"$set": {"feedbackURL": feedback_url}},
+                {"$set": {"formID": gform_id}}
             )
             return {"message": "Feedback URL added successfully."}, 200
         
@@ -269,9 +298,10 @@ def create_gform(event_id):
         # Prints the result to show the question has been added
         get_result = form_service.forms().get(formId=result["formId"]).execute()
         gform_url = get_result.get("responderUri")
+        gform_id = get_result.get("formId")
 
         if gform_url:
-            store_event_feedback_link(gform_url, event_id)
+            store_event_feedback_link(gform_url, event_id, gform_id)
         return get_result
     
     except ValueError as e:
@@ -298,13 +328,12 @@ def get_responses_with_formId(formId):
     result = form_service.forms().responses().list(formId=formId).execute()
     return result
 
-@app.route('/form/responses', methods=['GET'])
-def get_responses():
-    data = get_responses_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
+@app.route('/response/form/<formId>', methods=['GET'])
+def get_responses(formId):
+    data = get_responses_with_formId(formId)
     print(data)
     return {"data": data}
 
-# API to get form
 @app.route('/form/get', methods=['GET'])
 def get_form():
     data = get_form_with_formId("1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo")
@@ -317,18 +346,24 @@ def get_form_item():
     formId = "1gwDQnugorvErtxgSY97hAa-EEtC7kWb6q35n5zZxvgo"
     data = get_form_and_resposes(formId)
     return data
-    
+
 # API Route to get events
 @app.route('/eventdata', methods=['GET'])
 def get_event_data():
     events = list(event_data.find({}, {'_id': 0})) 
     return jsonify(events)
 
+# API Route to get event details
 @app.route('/eventsdetails', methods=['GET'])
 def get_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
 
+def save_responses():
+    pass
 
+# find reponses in gform and update participants list 
+
+    
 if __name__ == "__main__":
     app.run(debug=True)
