@@ -36,7 +36,7 @@ function LoginButton() {
   };
 
   return (
-    <div id="signInButton">
+    <div id="signInButton" className="mt-32">
       <GoogleLogin
         clientId={clientId}
         buttonText="Login"
