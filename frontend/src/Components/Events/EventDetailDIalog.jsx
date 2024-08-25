@@ -30,7 +30,7 @@ function EventDetailDialog({ open, onClose, event }) {
                 </DialogTitle>
             </Container>
             <DialogContent className="flex p-4">
-                <div className="flex-initial w-1/3 pr-4">
+                <div className="flex-initial w-full pr-4">
                     <img src={event ? event.imageURL : ''} alt={event ? event.name : ''} className="w-full h-auto rounded shadow" />
                 </div>
                 <div className="w-px bg-gray-300 mx-4 my-2"></div>
