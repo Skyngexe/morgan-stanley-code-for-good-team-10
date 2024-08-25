@@ -52,6 +52,7 @@ def default():
 def healthcheck():
     return 'Server is up and running!'
 
+
 # 1. Create User
 @app.route('/write/user', methods=['POST'])
 def create_new_user():
@@ -99,6 +100,7 @@ def create_new_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
     
+    
 # 2. Return Event
 @app.route('/read/event', methods=['GET'])
 def read_event_data():
@@ -133,11 +135,13 @@ def read_event_data():
 
     return jsonify(json.loads(json_util.dumps(merged_data)))
 
+
 # 3. Return All Events
 @app.route('/read/events', methods=['GET'])
 def get_events():
     events = list(event_data.find({}, {'_id': 0})) 
     return jsonify(events)
+
 
 # 4. Create Event
 @app.route('/create/event', methods=['POST'])
@@ -162,11 +166,13 @@ def create_new_event_and_form():
 #     events = list(event_data.find({}, {'_id': 0})) 
 #     return jsonify(events)
 
+
 # 5. Return All Events Details
 @app.route('/eventdetails', methods=['GET'])
 def get_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
+
 
 # 6. Update Single Event Information with Event ID
 @app.route('/update/event/<event_id>', methods=['PUT'])
@@ -184,6 +190,7 @@ def update_event_with_id(event_id):
         return jsonify({"message": "No changes made to the event"}), 200
     return jsonify({"message": "Event updated successfully"}), 200
     
+    
 # 7. Delete Single Event Information with Event ID
 @app.route('/delete/event/<event_id>', methods=['DELETE'])
 def delete_event_with_id(event_id):
@@ -197,6 +204,7 @@ def delete_event_with_id(event_id):
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
     
 # 8. Update Multiple Events with custom Query
 @app.route('/update/event', methods=['PUT'])
@@ -258,6 +266,7 @@ def store_event_feedback_link(feedback_url, event_id, gform_id):
     except Exception as e:
         raise ValueError(f"Error fetching event: {str(e)}")
 
+
 # 9. Create Google Form with Event ID
 @app.route('/create/form/<int:event_id>', methods=['POST'])
 def create_gform(event_id):
@@ -313,12 +322,14 @@ def create_gform(event_id):
     except ValueError as e:
         return {"error": str(e)}, 404 
 
+
 # 10. Return Google Form with Form ID
 @app.route('/form/get/<formId>', methods=['GET'])
 def get_form(formId):
     data = get_form_with_formId(formId)
     print(data)
     return {"data": data}
+
 
 # 11. Return Google Form Responses with Form ID
 @app.route('/response/form/<formId>', methods=['GET'])
@@ -327,11 +338,13 @@ def get_responses(formId):
     print(data)
     return {"data": data}
 
+
 # 12. Return Questions and Responses of a Google Form with Form ID
 @app.route('/form/question_and_responses/<formId>', methods=['GET'])
 def get_form_item(formId):
     data = get_form_and_resposes(formId)
     return data
+
 
 # 13. Save Feedbacks from Google Form and Return Feedbacks with Form ID
 @app.route('/feedback/show/<formId>', methods=['GET'])
@@ -403,6 +416,7 @@ def save_feedback(formId):
     except Exception as e:
         return {"error": str(e)}, 500
 
+
 # 14. Save All Registration Form Responses to Event and User Table
 @app.route('/response/save/regform', methods=['GET'])
 def save_geresponses():
@@ -467,7 +481,6 @@ def save_registration_responses(data, formId):
     except ValueError as e:
         return {"error": str(e)}, 404 
 
-
 def updateUserDataWithRegisteredEvent(existing_event, user):
     event_id = existing_event['eventId']
     event_name = existing_event['name']
@@ -503,6 +516,7 @@ def reloadLeaderBoard():
         
     serialized_users = [serialize_user(user) for user in all_users]
     return json.dumps(serialized_users, default=str)
+
 
 # 15. Return Leaderboard 
 @app.route('/leaderboard', methods=['GET'])
