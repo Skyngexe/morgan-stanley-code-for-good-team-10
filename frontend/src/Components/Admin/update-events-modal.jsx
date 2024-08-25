@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/view-events-and-feedbacks.css'
+import '../styles/view-events-and-feedbacks.module.css'
 
 function Modal({event}) {
 

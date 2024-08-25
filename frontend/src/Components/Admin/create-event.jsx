@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/create-event.css";
+import "../styles/create-event.module.css";
 
 const CreateEvent = () => {
     const [eventName, setEventName] = useState("");

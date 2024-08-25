@@ -1,4 +1,4 @@
-import "../styles/card-menu.css";
+import "../styles/card-menu.module.css";
 import { Link } from "react-router-dom";
 
 const CardMenu = () => {
