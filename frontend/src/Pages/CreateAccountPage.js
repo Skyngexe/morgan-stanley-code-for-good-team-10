@@ -50,28 +50,28 @@ function CreateAccountPage() {
     <div className="flex flex-col items-center">
       <div className="mt-32 container min-w-[300px] shadow-xl">
         <h1>Creating account for {email}</h1>
-        <form className="flex flex-col" onSubmit={handleSubmit}>
-          <label>
+        <form className="flex flex-col items-start" onSubmit={handleSubmit}>
+          <label className="flex items-center gap-x-4">
             Username:{" "}
             <input
               type="text"
               name="username"
               value={accountData.username}
               onChange={handleChange}
-              className="input input-bordered"
+              className="border rounded"
             />
           </label>
-          <label>
+          <label className="flex items-center gap-x-4">
             Number:{" "}
             <input
               type="text"
               name="number"
               value={accountData.number}
               onChange={handleChange}
-              className="input input-bordered"
+              className="border rounded"
             />
           </label>
-          <label>
+          <label className="flex items-center gap-x-4">
             Role:{" "}
             <input
               type="radio"
@@ -79,7 +79,6 @@ function CreateAccountPage() {
               value="volunteer"
               checked={accountData.role === "volunteer"}
               onChange={handleChange}
-              className="input input-bordered"
             />{" "}
             Volunteer
             <input
@@ -88,21 +87,20 @@ function CreateAccountPage() {
               value="participant"
               checked={accountData.role === "participant"}
               onChange={handleChange}
-              className="input input-bordered"
             />{" "}
             Participant
           </label>
-          <label>
+          <label className="flex items-center gap-x-4">
             Ethnicity:{" "}
             <input
               type="text"
               name="ethnicity"
               value={accountData.ethnicity}
               onChange={handleChange}
-              className="input input-bordered"
+              className="border rounded"
             />
           </label>
-          <label>
+          <label className="flex items-center gap-x-4">
             Gender:{" "}
             <input
               type="radio"
@@ -110,7 +108,6 @@ function CreateAccountPage() {
               value="male"
               checked={accountData.gender === "male"}
               onChange={handleChange}
-              className="input input-bordered"
             />{" "}
             Male
             <input
@@ -119,28 +116,27 @@ function CreateAccountPage() {
               value="female"
               checked={accountData.gender === "female"}
               onChange={handleChange}
-              className="input input-bordered"
             />{" "}
             Female
           </label>
-          <label>
+          <label className="flex items-center gap-x-4">
             Age:{" "}
             <input
               type="number"
               name="age"
               value={accountData.age}
               onChange={handleChange}
-              className="input input-bordered"
+              className="border rounded"
             />
           </label>
-          <label>
+          <label className="flex items-center gap-x-4">
             Preferred Language:{" "}
             <input
               type="text"
               name="preferred_language"
               value={accountData.preferred_language}
               onChange={handleChange}
-              className="input input-bordered"
+              className="border rounded"
             />
           </label>
           <input type="submit" value="Create Account" />
