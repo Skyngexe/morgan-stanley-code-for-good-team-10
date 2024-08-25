@@ -3,7 +3,7 @@ import React from 'react';
 const Card = ({ video }) => {
   const handleClick = () => {
     
-    window.location.href = video.link;
+    window.location.href = video.url;
     
   };
 

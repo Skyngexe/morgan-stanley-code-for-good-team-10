@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Card from './Card';
+import mockVideoData from './MockVideo';
 
 const VideoList = () => {
   const [videoList, setVideoList] = useState([]);
@@ -9,21 +10,42 @@ const VideoList = () => {
     fetchData();
   }, []);
 
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await axios.get('http://127.0.0.1:5000/videodata');
+  //     const videos = response.data;
+  //     setVideoList(videos);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
+
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://127.0.0.1:5000/videodata');
-      const videos = response.data;
+    
+      const videos = mockVideoData;
+      console.log(videos)
       setVideoList(videos);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
-
+  
+  
   return (
+    <div>
+    <h3 className="text-3xl font-bold text-gray-800 mb-4">
+              Start Watching Videos
+    </h3>
     <div className="grid grid-cols-2 gap-4">
+
       {videoList.length > 0 ? (
         videoList.map((video, index) => (
-          <Card key={index} video={video} />
+          <div key={index} className="bg-white shadow-md rounded-lg p-6">
+            <Card key={index} video={video} />
+          </div>
+
+        
         ))
       ) : (
         <div className="col-span-2 bg-white shadow-md rounded-lg p-6 flex items-center justify-center">
@@ -35,6 +57,7 @@ const VideoList = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
