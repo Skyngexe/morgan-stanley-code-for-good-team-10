@@ -48,7 +48,7 @@ function CreateAccountPage() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="mt-32 container min-w-[300px] shadow-xl">
+      <div className="mt-32 p-4 rounded container min-w-[300px] shadow-xl">
         <h1>Creating account for {email}</h1>
         <form className="flex flex-col items-start" onSubmit={handleSubmit}>
           <label className="flex items-center gap-x-4">
