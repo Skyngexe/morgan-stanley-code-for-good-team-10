@@ -26,7 +26,7 @@ user_db = db_client[USER_DB]
 feedback_db = db_client[FEEDBACK_DB]
 event_data = event_db['Event Data']
 event_details= event_db['Event Details']
-user_data = event_db['User Data']
+user_data = user_db['User Data']
 events_detail_collection = event_db['Event Details']
 feedback_collection = feedback_db['Events Feedback']
 
@@ -404,40 +404,73 @@ def save_registration_responses(data, formId):
                     register = "registered_participants"
 
                 existing_event = event_data.find_one({'form_Id': formId})
-
-                if existing_event:
-                    existing_combination = event_data.find_one({
-                        "form_Id": formId,
-                        register: {
-                            "$elemMatch": {
-                                "email": email,
-                                "phone_number": phone_number
-                            }
-                        }
-                    })
-
-                    if not existing_combination:
-                        event_data.update_one(
-                            {"form_Id": formId},
-                            {
-                                "$push": {
-                                    register: {
-                                        "email": email,
-                                        "phone_number": phone_number
-                                    }
-                                }
-                            }
-                        )
+                user = user_data.find_one({
+                            '$or': [
+                                {'email': email},
+                                {'phone': phone_number}
+                            ]
+                        })
+                
+                if user:
+                    if existing_event:
+                        updateUserDataWithRegisteredEvent(existing_event, user)
+                        updateEventRegisteredDetails(register, formId, email, phone_number)
+                    else:
+                        return {"message": "Event with the specified form_Id not found."}, 404
                 else:
-                    # If the event with the given form_Id doesn't exist, you can return an error message or take appropriate action
-                    return {"message": "Event with the specified form_Id not found."}, 404
+                    if existing_event:
+                        updateEventRegisteredDetails(register, formId, email, phone_number)
+                    else:
+                        return {"message": "Event with the specified form_Id not found."}, 404
 
         return {"message": "Feedback URL added successfully."}, 200
+    
     except ValueError as e:
         return {"error": str(e)}, 404 
 
-# find reponses in gform and update participants list 
 
+def updateUserDataWithRegisteredEvent(existing_event, user):
+    event_id = existing_event['eventId']
+    event_name = existing_event['name']
+    google_id = user['google_id']
+    if 'registered_events' not in user or event_id not in user['registered_events']:
+        user_data.update_one(
+            {'google_id': google_id},
+            {
+                '$addToSet': {
+                    'registered_events': [event_id, event_name]
+                }
+            }
+        )
+
+def checkIfAlreadyRegisteredEvent(register, formId, email, phone_number):
+    check = event_data.find_one({
+                            "form_Id": formId,
+                            register: {
+                                "$elemMatch": {
+                                    "email": email,
+                                    "phone_number": phone_number
+                                }
+                            }
+
+                        })
+    return check  
+
+def updateEventRegisteredDetails(register, formId, email, phone_number):
+    existing_combination = checkIfAlreadyRegisteredEvent(register, formId, email, phone_number)
+
+    if not existing_combination:
+        event_data.update_one(
+            {"form_Id": formId},
+            {
+                "$push": {
+                    register: {
+                        "email": email,
+                        "phone_number": phone_number
+                    }
+                }
+            }
+        )
 
     
 if __name__ == "__main__":
