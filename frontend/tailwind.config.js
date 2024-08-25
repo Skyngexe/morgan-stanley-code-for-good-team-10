@@ -50,6 +50,7 @@ module.exports = {
     },
   },
   plugins: [
-    require('tw-elements-react/dist/plugin')  // Ensure this path is correct
+    require('tw-elements-react/dist/plugin'),  // Ensure this path is correct
+    require('daisyui'),
   ],
 };

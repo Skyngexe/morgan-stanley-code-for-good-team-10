@@ -1,4 +1,4 @@
 /venv
 /token.json
 *.pyc
-/node_modules
+/test.txt
