@@ -6,12 +6,13 @@ import json
 from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, create_registration_and_feedback_form, extract_time, extract_date
 from bson.objectid import ObjectId
-from gridfs import GridFS
+
+
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 from datetime import datetime
 
@@ -30,7 +31,7 @@ event_details= event_db['Event Details']
 # user_data = user_db['User Data']
 events_detail_collection = event_db['Event Details']
 feedback_collection = feedback_db['Events Feedback']
-gfs_photo = GridFS(event_db, "photo")
+
 
 class UserRole(Enum):
     """
@@ -161,11 +162,28 @@ def get_events():
         event['_id'] = str(event['_id'])  
     return jsonify(events)
 
+def create_unique_event_id():
+    max_event_id = event_data.find_one(sort=[("event_id", -1)])  # Get the event with the highest event_id
+    if max_event_id and max_event_id.get("event_id"):
+        next_event_id = int(max_event_id.get("event_id")) + 1
+    else:
+        next_event_id = 1
+    
+    return next_event_id
+
 
 # 5. Create Event
 @app.route('/create/event', methods=['POST'])
 def create_new_event_and_form():
     try:
+        '''
+        if 'image' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
+
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
+        '''
         new_event = request.json  # Access JSON data from the request object
         new_event["startDate"]= datetime.strptime(new_event["startDate"], "%Y-%m-%dT%H:%M") 
         new_event["endDate"]= datetime.strptime(new_event["endDate"], "%Y-%m-%dT%H:%M") 
@@ -174,20 +192,13 @@ def create_new_event_and_form():
         new_event['registrationURL'] = forms["registrationURL"]
         new_event['feedback_form_Id'] = forms["feedback_form_Id"]
         new_event['feedbackURL'] = forms["feedbackURL"]
-
-        if 'image' in request.files:
-            image_file = request.files['image']
-            new_file_name = "my-image"  # Set your desired filename
-            gfs_file = gfs_photo.new_file(filename=new_file_name)
-            gfs_file.write(image_file.stream)  # Write the image data
-            gfs_file.close()  # Close the file
-            new_event['image_id'] = gfs_file._id
-
+        new_event['eventId'] = create_unique_event_id()
         event_details.insert_one(new_event)
         print(new_event)
         event_data.insert_one(new_event)
         
         return jsonify({'message': 'Event data inserted successfully'}), 200
+    
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
@@ -437,6 +448,7 @@ def get_gform_feedback(formId):
     return jsonify(feedback)
     
 
+'''
 @app.route('/image/<image_id>', methods=['GET'])
 def get_image(image_id):
     try:
@@ -447,7 +459,7 @@ def get_image(image_id):
         }
     except Exception as e:
         return jsonify({'error': str(e)}), 404
-    
+'''
 # save feedback from gform based on formId to Feedback.Event Feedback
 def save_feedback(formId):
     event = get_form_and_resposes(formId)
@@ -613,6 +625,7 @@ def reloadLeaderBoard():
 
 # 15. Return Leaderboard 
 @app.route('/leaderboard', methods=['GET'])
+@cross_origin(supports_credentials=True)
 def get_leaderboard():
     leaderboard_data = reloadLeaderBoard()
     return jsonify(json.loads(leaderboard_data))
