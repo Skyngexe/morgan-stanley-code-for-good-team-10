@@ -1,7 +1,11 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
 
-function EventDetailDialog({ open, onClose, events }) {
+function EventDetailDialog({ open, onClose, event }) {
+    const getOnlyDate = (endDate) => {
+        return endDate ? endDate.slice(0, 10) : "";
+    };
+
     return (
         <Dialog 
             open={open} 
@@ -11,19 +15,19 @@ function EventDetailDialog({ open, onClose, events }) {
             fullWidth
         >
             <DialogTitle id="event-details-title">
-                {events ? events.name : 'Event Details'}
+                {event ? event.name : 'Event Details'}
             </DialogTitle>
             <DialogContent>
-                {events ? (
+                {event ? (
                     <>
                         <Typography variant="h6" gutterBottom>
-                            Location: {events.Location}
+                            Location: {event.location_detail}
                         </Typography>
                         <Typography variant="h6" gutterBottom>
-                            Date: {events.endDate}
+                            Date: {getOnlyDate(event.endDate.$date)}
                         </Typography>
                         <Typography variant="body1" paragraph>
-                            {events.descriptions}
+                            {event.descriptions_detail}
                         </Typography>
                         {/* You can add more details here */}
                     </>

@@ -149,10 +149,6 @@ def create_new_event_and_form():
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-    
-@app.route('/healthcheck')
-def healthcheck():
-    return 'Server is up and running!'
 
 @app.route('/update', methods=['PUT'])
 def update_event_data():
