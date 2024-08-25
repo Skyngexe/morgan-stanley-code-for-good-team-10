@@ -1,3 +1,5 @@
+from ai_chatbox.model.rag_model import RAGModel
+
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from enum import Enum
@@ -9,6 +11,8 @@ from oauth2client import client, file, tools
 from flask_cors import CORS
 from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, create_registration_and_feedback_form, extract_time, extract_date
 from bson.objectid import ObjectId
+
+model = RAGModel(data_path='./ai_chatbox/data/event.js')
 
 app = Flask(__name__)
 CORS(app)
@@ -626,6 +630,14 @@ def updateEventRegisteredDetails(register, formId, email, phone_number):
             }
         )
 
+# API Route for AI Chatbot
+@app.route('/chatbot', methods=['POST'])
+def get_model_answer():
+    data = request.json
+    question = data.get('question')
+    answer = model.answer_question(question)
+    print(answer)
+    return {"answer": answer}
 
 if __name__ == "__main__":
     app.run(debug=True)
