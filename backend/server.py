@@ -8,7 +8,6 @@ from httplib2 import Http
 from oauth2client import client, file, tools
 from flask_cors import CORS, cross_origin
 from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, create_registration_and_feedback_form, extract_time, extract_date
-from bson.objectid import ObjectId
 
 
 app = Flask(__name__)
@@ -176,14 +175,7 @@ def create_unique_event_id():
 @app.route('/create/event', methods=['POST'])
 def create_new_event_and_form():
     try:
-        '''
-        if 'image' not in request.files:
-            return jsonify({'error': 'No file part'}), 400
 
-        file = request.files['image']
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
-        '''
         new_event = request.json  # Access JSON data from the request object
         new_event["startDate"]= datetime.strptime(new_event["startDate"], "%Y-%m-%dT%H:%M") 
         new_event["endDate"]= datetime.strptime(new_event["endDate"], "%Y-%m-%dT%H:%M") 
