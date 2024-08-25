@@ -3,7 +3,7 @@ import "../styles/card-menu.css"
 
 const CardMenu = () => {
   return (
-    <div className="navbar">
+    <div className="navbar w-full">
       <div className="card-container">
       <div className="card">
           <h3 className="card-title">Create Event</h3>
