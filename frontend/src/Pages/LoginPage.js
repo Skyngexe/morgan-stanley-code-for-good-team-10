@@ -20,7 +20,7 @@ function LoginPage() {
 
     return (
         <div className="flex flex-col items-center mt-32">
-            <LoginButton />
+            <LoginButton buttonText="Login" />
             {/* <LogoutButton /> */}
         </div>
     );

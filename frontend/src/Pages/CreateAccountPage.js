@@ -145,7 +145,7 @@ function CreateAccountPage() {
           <input type="submit" value="Create Account" />
         </form>
       </div>
-      <LoginButton />
+      <LoginButton buttonText="Change Account" />
     </div>
   );
 }

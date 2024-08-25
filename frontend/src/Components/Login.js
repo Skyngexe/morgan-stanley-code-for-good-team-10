@@ -5,7 +5,7 @@ import axios from "axios";
 const clientId =
   "195069951488-hstkrdurhqrot2i2ckm82djmotl7piig.apps.googleusercontent.com";
 
-function LoginButton() {
+const LoginButton = ({buttonText}) => {
   const setEmail = useStore((state) => state.setEmail);
   const setImageUrl = useStore((state) => state.setImageUrl);
   const setGoogleId = useStore((state) => state.setGoogleId);
@@ -39,7 +39,7 @@ function LoginButton() {
     <div id="signInButton">
       <GoogleLogin
         clientId={clientId}
-        buttonText="Login"
+        buttonText={buttonText}
         onSuccess={onSuccess}
         onFailure={onFailure}
         cookiePolicy={"single_host_origin"}
