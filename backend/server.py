@@ -301,11 +301,13 @@ def get_event_data():
     events = list(event_data.find({}, {'_id': 0})) 
     return jsonify(events)
 
+
 # API Route to get event details
-@app.route('/eventsdetails', methods=['GET'])
+@app.route('/eventdetails', methods=['GET'])
 def get_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
+
 
 # API route to get the most updated feedback on an event based on formId
 @app.route('/feedback/show/<formId>', methods=['GET'])
@@ -435,6 +437,7 @@ def save_registration_responses(data, formId):
         return {"error": str(e)}, 404 
 
 # find reponses in gform and update participants list 
+
 
     
 if __name__ == "__main__":
