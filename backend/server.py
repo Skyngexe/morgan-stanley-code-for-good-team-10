@@ -164,6 +164,8 @@ def create_new_event_and_form():
         event_details.insert_one(new_event)
         print(new_event)
         event_data.insert_one(new_event)
+        eventId = new_event['eventId']
+        create_gform(eventId)
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -330,22 +332,16 @@ def get_gform_feedback(formId):
         item['_id'] = str(item['_id'])
     return jsonify(feedback)
     
-# save feedback from gform based on formId to Feedback.Event Feedback, one document corresponds to one feedback
+# save feedback from gform based on formId to Feedback.Event Feedback
 def save_feedback(formId):
     event = get_form_and_resposes(formId)
     
     if not event:
         return {"message": "Event with the specified form_Id not found."}, 404
 
-    responseIds = set()  # To keep track of processed responseIds
-
     try:
         for response in event.get('responses', {}).get('responses', []):
             responseId = response.get('responseId')
-            
-            # Skip previously processed responseIds
-            if responseId in responseIds:
-                continue
             
             feedback = None
             rating = None
@@ -359,12 +355,37 @@ def save_feedback(formId):
                 else:
                     feedback = value
 
-            existing_feedback = feedback_collection.find_one({'responseId': responseId})
-            if not existing_feedback:
-                new_document = {'responseId': responseId, 'form_Id': formId, 'feedback': feedback, 'rating': rating}
-                feedback_collection.insert_one(new_document)
+            
+            #existing_feedback = feedback_collection.find_one({'responseId': responseId})
+            exiting_event = feedback_collection.find_one({'form_Id': formId})
+            event_data_collection = event_data.find_one({'feedback_form_id': formId})
+            name = event_data_collection['name']
+            eventId = event_data_collection['eventId']
+            location = event_data_collection['location']
+            startDate = event_data_collection['startDate']
+            endDate = event_data_collection['endDate']
+            event_type = event_data_collection['eventType']
 
-            responseIds.add(responseId)  # Add processed responseId to the set
+            if exiting_event:
+                if responseId not in exiting_event['responseId']:
+                    feedback_collection.update_one(
+                        {'form_Id': formId},
+                        {'$push': {'responseId': responseId, 'feedback': feedback, 'rating': rating}}
+                    )
+            else:
+                new_document = {
+                    'name': name,
+                    'eventId': eventId,
+                    'location': location,
+                    'startDate': startDate,
+                    'endDate': endDate,
+                    'event_type': event_type,
+                    'responseId': [responseId],
+                    'form_Id': formId,
+                    'feedback': [feedback] if feedback else [],
+                    'rating': [rating] if rating else []
+                }
+                feedback_collection.insert_one(new_document)
 
         return {"message": "Feedback saved successfully"}
 
