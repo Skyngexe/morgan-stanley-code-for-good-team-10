@@ -15,7 +15,7 @@ function Chatbot() {
 
   useEffect(() => {
     async function loadWelcomeMessage() {
-      setMessages();
+      setMessages([]);
     }
     loadWelcomeMessage();
   }, []);
