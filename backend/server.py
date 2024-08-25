@@ -432,17 +432,23 @@ def save_registration_responses(data, formId):
 def updateUserDataWithRegisteredEvent(existing_event, user):
     event_id = existing_event['eventId']
     event_name = existing_event['name']
-    google_id = user['google_id']
-    if 'registered_events' not in user or event_id not in user['registered_events']:
-        user_data.update_one(
-            {'google_id': google_id},
-            {
-                '$addToSet': {
-                    'registered_events': [event_id, event_name]
-                }
+    google_id = user['googleId']
+    if 'registered_events' not in user or event_id not in [event[0] for event in user['registered_events']]:
+        registered_events_count = len(set([event[0] for event in user.get('registered_events', [])]))
+        update_query = {
+            '$push': {
+                'registered_events': [event_id, event_name]
+            },
+            '$set': {
+                'points': registered_events_count
             }
+        }
+        user_data.update_one(
+            {'googleId': google_id},
+            update_query
         )
 
+def reloadLeaderBoard
 def checkIfAlreadyRegisteredEvent(register, formId, email, phone_number):
     check = event_data.find_one({
                             "form_Id": formId,
@@ -472,6 +478,6 @@ def updateEventRegisteredDetails(register, formId, email, phone_number):
             }
         )
 
-    
+
 if __name__ == "__main__":
     app.run(debug=True)
