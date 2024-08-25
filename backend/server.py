@@ -321,8 +321,6 @@ def get_event_data():
 def get_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
-
-
 # API route to get the most updated feedback on an event based on formId
 @app.route('/feedback/show/<formId>', methods=['GET'])
 def get_gform_feedback(formId):
