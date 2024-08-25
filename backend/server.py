@@ -25,8 +25,9 @@ event_db = db_client[EVENT_DB]
 user_db = db_client[USER_DB]
 feedback_db = db_client[FEEDBACK_DB]
 event_data = event_db['Event Data']
-event_details= event_db['Event Details']
 user_data = user_db['User Data']
+event_details= event_db['Event Details']
+# user_data = user_db['User Data']
 events_detail_collection = event_db['Event Details']
 feedback_collection = feedback_db['Events Feedback']
 
@@ -52,6 +53,23 @@ def default():
 def healthcheck():
     return 'Server is up and running!'
 
+
+# 0. Find User
+@app.route('/read/user/<id>', methods=['GET'])
+def get_user_by_google_id(id):
+    # email: "codeforgood2024team10@gmail.com"
+    # familyName: undefined
+    # givenName: "CodeForGood"
+    # googleId: "111762572170626902982"
+    # imageUrl: "https://lh3.googleusercontent.com/a/ACg8ocJF5-hBnR0E6OvQEDAIPHCqpMDW1D4F7x_Pjgk6nF6CtQOwlw=s96-c"
+    # name: "CodeForGood"
+    user = user_data.find_one({"googleId": id})
+    if user:
+        # Convert ObjectId to string
+        user['_id'] = str(user['_id'])
+        return jsonify({"message": "User found", "user": user})
+    else:
+        return jsonify({"message": "User not found"})
 
 # 1. Create User
 @app.route('/write/user', methods=['POST'])
