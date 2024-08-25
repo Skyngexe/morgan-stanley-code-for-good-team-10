@@ -29,7 +29,6 @@ function FeedbackContainer() {
       const events = response.data;
       const today = new Date();
       const pastEvents = events.filter(event => new Date(event.endDate) < today);
-
       setPastEventsList(pastEvents);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -38,7 +37,7 @@ function FeedbackContainer() {
 
   const fetchFeedback = async (formId) => {
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/form/item/${formId}`);
+      const response = await axios.get(`http://127.0.0.1:5000/form/question_and_responses/${formId}`);
       setFeedbackData(response.data);
       console.log("Feedback data:", feedbackData);
       setDialogOpen(true);
@@ -130,7 +129,7 @@ function FeedbackContainer() {
                 <Button
                   size="small"
                   className={classes.feedbackButton}
-                  onClick={() => fetchFeedback(event.feedback_form_id)}
+                  onClick={() => fetchFeedback(event.feedback_form_Id)}
                   style={{ marginTop: '16px' }}
                 >
                   Show Feedback

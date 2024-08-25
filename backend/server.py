@@ -222,9 +222,9 @@ def update_forms(event_id):
 
     # Extract form_Id and feedback_form_Id
     form_id = event.get("form_Id")
-    feedback_form_id = event.get("feedback_form_Id")
+    feedback_form_Id = event.get("feedback_form_Id")
 
-    if not form_id or not feedback_form_id:
+    if not form_id or not feedback_form_Id:
         return {"error": "Form IDs not found in the event data"}, 400
     
     # Initialize the Google Forms API service
@@ -273,7 +273,7 @@ def update_forms(event_id):
             },
         ]
     }
-    form_service.forms().batchUpdate(formId=feedback_form_id, body=feedback_update_body).execute()
+    form_service.forms().batchUpdate(formId=feedback_form_Id, body=feedback_update_body).execute()
 
     return {"message": "Forms updated successfully"}, 200
     
@@ -332,7 +332,7 @@ def store_event_feedback_link(feedback_url, event_id, gform_id):
                 {
                     "$set": {
                         "feedbackURL": feedback_url,
-                        "feedback_form_id": gform_id
+                        "feedback_form_Id": gform_id
                     }
                 }
             )
@@ -421,19 +421,6 @@ def get_form_item(formId):
     data = get_form_and_resposes(formId)
     return data
 
-# API Route to get events
-@app.route('/eventdata', methods=['GET'])
-def get_event_data():
-    events = list(event_data.find({}, {'_id': 0})) 
-    return jsonify(events)
-
-
-# API Route to get event details
-@app.route('/eventdetails', methods=['GET'])
-def get_event_details():
-    events = list(events_detail_collection.find({}, {'_id': 0})) 
-    return jsonify(events)
-
 # 13. Save Feedbacks from Google Form and Return Feedbacks with Form ID
 @app.route('/feedback/<formId>', methods=['GET'])
 def get_gform_feedback(formId):
@@ -469,7 +456,7 @@ def save_feedback(formId):
             
             #existing_feedback = feedback_collection.find_one({'responseId': responseId})
             exiting_event = feedback_collection.find_one({'form_Id': formId})
-            event_data_collection = event_data.find_one({'feedback_form_id': formId})
+            event_data_collection = event_data.find_one({'feedback_form_Id': formId})
             
             name = event_data_collection['name']
             eventId = event_data_collection['eventId']
