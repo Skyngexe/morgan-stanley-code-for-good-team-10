@@ -62,7 +62,9 @@ function App() {
           <Route path="events" element={<EventPage />} />
           <Route path="dashboard" element={<p>Dashboard Page</p>} />
           {/* <Route path="admin" element={<AdminPage />} /> */}
-          <Route path="admin" element={<CardMenu />}>
+          <Route path="admin">
+            <Route path="" element={<CardMenu />} />
+            <Route path="create-event" element={<CreateEvent />} />
             <Route
               path="view-events"
               element={
@@ -72,7 +74,6 @@ function App() {
                 </>
               }
             />
-            <Route path="create-event" element={<CreateEvent />} />
             <Route
               path="view-feedbacks"
               element={
