@@ -14,7 +14,6 @@ CORS(app)
 
 from datetime import datetime
 
-
 MONGO_URI = "mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 EVENT_DB = "Event"
 USER_DB = 'User'
@@ -48,7 +47,11 @@ class UserRole(Enum):
 def default():
     return 'Team 10 server'
 
-# API Route to create users
+@app.route('/healthcheck')
+def healthcheck():
+    return 'Server is up and running!'
+
+# 1. Create User
 @app.route('/write/user', methods=['POST'])
 def create_new_user():
     """
@@ -95,7 +98,7 @@ def create_new_user():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
     
-# API Route to get single event
+# 2. Return Event
 @app.route('/read/event', methods=['GET'])
 def read_event_data():
     data = list(event_data.find({}))
@@ -129,13 +132,13 @@ def read_event_data():
 
     return jsonify(json.loads(json_util.dumps(merged_data)))
 
-# API Route to get all events
+# 3. Return All Events
 @app.route('/read/events', methods=['GET'])
 def get_events():
     events = list(event_data.find({}, {'_id': 0})) 
     return jsonify(events)
 
-# API Route to create new event and google form
+# 4. Create Event
 @app.route('/create/event', methods=['POST'])
 def create_new_event_and_form():
     try:
@@ -151,12 +154,21 @@ def create_new_event_and_form():
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-    
-@app.route('/healthcheck')
-def healthcheck():
-    return 'Server is up and running!'
 
-@app.route('/update', methods=['PUT'])
+# Return All Events Data
+# @app.route('/eventdata', methods=['GET'])
+# def get_event_data():
+#     events = list(event_data.find({}, {'_id': 0})) 
+#     return jsonify(events)
+
+# 5. Return All Events Details
+@app.route('/eventdetails', methods=['GET'])
+def get_event_details():
+    events = list(events_detail_collection.find({}, {'_id': 0})) 
+    return jsonify(events)
+
+# 6. Update Event
+@app.route('/update/event', methods=['PUT'])
 def update_event_data():
     query = request.json.get('query', {})
     new_values = request.json.get('new_values', {})
@@ -215,7 +227,7 @@ def store_event_feedback_link(feedback_url, event_id, gform_id):
     except Exception as e:
         raise ValueError(f"Error fetching event: {str(e)}")
 
-# API to create form
+# 7. Create Google Form with Event ID
 @app.route('/create/form/<int:event_id>', methods=['POST'])
 def create_gform(event_id):
     SCOPES = "https://www.googleapis.com/auth/forms.body"
@@ -270,50 +282,27 @@ def create_gform(event_id):
     except ValueError as e:
         return {"error": str(e)}, 404 
 
-@app.route('/response/form/<formId>', methods=['GET'])
-def get_responses(formId):
-    data = get_responses_with_formId(formId)
-    print(data)
-    return {"data": data}
-
-@app.route('/response/save/regform', methods=['GET'])
-def save_geresponses():
-    events = event_data.find({})
-    for event in events:
-        formId = event.get('form_Id')
-        if formId:
-            data = get_responses_with_formId(formId)
-            print(data)
-            save_registration_responses(data, formId)
-    return {"message": "all registration info saved"}
-
+# 8. Return Google Form with Form ID
 @app.route('/form/get/<formId>', methods=['GET'])
 def get_form(formId):
     data = get_form_with_formId(formId)
     print(data)
     return {"data": data}
 
-# API to get form questions and responses
-@app.route('/form/item/<formId>', methods=['GET'])
+# 9. Return Google Form Responses with Form ID
+@app.route('/response/form/<formId>', methods=['GET'])
+def get_responses(formId):
+    data = get_responses_with_formId(formId)
+    print(data)
+    return {"data": data}
+
+# 10. Return Questions and Responses of a Google Form with Form ID
+@app.route('/form/question_and_responses/<formId>', methods=['GET'])
 def get_form_item(formId):
     data = get_form_and_resposes(formId)
     return data
 
-# API Route to get events
-@app.route('/eventdata', methods=['GET'])
-def get_event_data():
-    events = list(event_data.find({}, {'_id': 0})) 
-    return jsonify(events)
-
-
-# API Route to get event details
-@app.route('/eventdetails', methods=['GET'])
-def get_event_details():
-    events = list(events_detail_collection.find({}, {'_id': 0})) 
-    return jsonify(events)
-
-
-# API route to get the most updated feedback on an event based on formId
+# 11. Save Feedbacks from Google Form and Return Feedbacks with Form ID
 @app.route('/feedback/show/<formId>', methods=['GET'])
 def get_gform_feedback(formId):
     save_feedback(formId)
@@ -349,6 +338,7 @@ def save_feedback(formId):
             #existing_feedback = feedback_collection.find_one({'responseId': responseId})
             exiting_event = feedback_collection.find_one({'form_Id': formId})
             event_data_collection = event_data.find_one({'feedback_form_id': formId})
+            
             name = event_data_collection['name']
             eventId = event_data_collection['eventId']
             location = event_data_collection['location']
@@ -381,6 +371,18 @@ def save_feedback(formId):
 
     except Exception as e:
         return {"error": str(e)}, 500
+
+# 12. Save All Registration Form Responses to Event and User Table
+@app.route('/response/save/regform', methods=['GET'])
+def save_geresponses():
+    events = event_data.find({})
+    for event in events:
+        formId = event.get('form_Id')
+        if formId:
+            data = get_responses_with_formId(formId)
+            print(data)
+            save_registration_responses(data, formId)
+    return {"message": "all registration info saved"}
 
 # function to save registration reponses (phone number & email) into the event_data based on formId and role 
 def save_registration_responses(data, formId):
@@ -471,13 +473,11 @@ def reloadLeaderBoard():
     serialized_users = [serialize_user(user) for user in all_users]
     return json.dumps(serialized_users, default=str)
 
-# Assuming you want to return the JSON response in a Flask route
+# 13. Return Leaderboard 
 @app.route('/leaderboard', methods=['GET'])
 def get_leaderboard():
     leaderboard_data = reloadLeaderBoard()
     return jsonify(json.loads(leaderboard_data))
-
-
 
 
 def checkIfAlreadyRegisteredEvent(register, formId, email, phone_number):
