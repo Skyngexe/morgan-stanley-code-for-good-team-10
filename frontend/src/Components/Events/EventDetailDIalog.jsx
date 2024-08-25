@@ -22,31 +22,32 @@ function EventDetailDialog({ open, onClose, event }) {
             aria-labelledby="event-details-title"
             maxWidth="lg"
             fullWidth
-            className="font-sans rounded-lg" // Rounded edges
+            className="font-sans rounded-lg" 
         >
             <Container className="mb-2 bg-yellow rounded-t-lg">
-                <DialogTitle id="event-details-title" className="text-left text-2xl font-bold p-4">
+                <DialogTitle id="event-details-title" style={{fontWeight: 'bold'}}>
                     {event ? event.name : 'Event Details'}
                 </DialogTitle>
             </Container>
             <DialogContent className="flex p-4">
-                <div className="flex-initial w-1/3 pr-4">
+                <div className="flex-initial w-full pr-3">
                     <img src={event ? event.imageURL : ''} alt={event ? event.name : ''} className="w-full h-auto rounded shadow" />
                 </div>
                 <div className="w-px bg-gray-300 mx-4 my-2"></div>
-                <div className="flex-auto">
+                <div className="flex-auto pl-3">
                     <Stack spacing={2}>
                         {event ? (
                             <>
-                                <Stack direction="row" spacing={1}>
-                                    <Chip label={"Theme: " + event.eventType} color="error" variant="filled" />
-                                    <Chip label={event.fee_detail} color="error" variant="filled" />
-                                    <Chip label={"Quota: " + event.quota} color="error" variant="filled" />
-                                </Stack>
                                 <DetailItem title="Location" detail={event.Location} />
                                 <DetailItem title="Date" detail={getOnlyDate(event.endDate.$date)} />
+                                <DetailItem title="Time" detail={event.time} />
                                 <DetailItem title="Eligibility" detail={event.eligibility} />
                                 <DetailItem title="Description" detail={event.descriptions_detail} />
+                                <Stack direction="row" spacing={1}>
+                                    <Chip label={"Theme: " + event.eventType} color="error" variant="filled" style={{backgroundColor: 'yellow', color: 'black'}} />
+                                    <Chip label={"Fee: " + event.fee_detail} color="error" variant="filled" style={{backgroundColor: 'yellow', color: 'black'}} />
+                                    <Chip label={"Quota: " + event.quota} color="error" variant="filled" style={{backgroundColor: 'yellow', color: 'black'}} />
+                                </Stack>
                             </>
                         ) : (
                             <p>Loading...</p>
@@ -55,7 +56,7 @@ function EventDetailDialog({ open, onClose, event }) {
                 </div>
             </DialogContent>
             <DialogActions className="p-4">
-                <Button onClick={onClose} className="bg-blue hover:bg-blue text-white font-bold py-2 px-4 rounded">
+                <Button onClick={onClose} style={{color: 'black'}}>
                     Close
                 </Button>
             </DialogActions>
