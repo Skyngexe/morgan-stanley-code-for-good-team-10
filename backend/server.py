@@ -24,6 +24,7 @@ db_client = MongoClient(MONGO_URI)
 event_db = db_client[EVENT_DB]
 user_db = db_client[USER_DB]
 event_data = event_db['Event Data']
+user_data = user_db['User Data']
 event_details= event_db['Event Details']
 user_data = event_db['User Data']
 events_detail_collection = event_db['Event Details']
@@ -45,6 +46,23 @@ class UserRole(Enum):
 @app.route('/')
 def default():
     return 'Team 10 server'
+
+# API Route to find user by google id or create user
+@app.route('/read/user/<id>', methods=['GET'])
+def get_user_by_google_id(id):
+    # email: "codeforgood2024team10@gmail.com"
+    # familyName: undefined
+    # givenName: "CodeForGood"
+    # googleId: "111762572170626902982"
+    # imageUrl: "https://lh3.googleusercontent.com/a/ACg8ocJF5-hBnR0E6OvQEDAIPHCqpMDW1D4F7x_Pjgk6nF6CtQOwlw=s96-c"
+    # name: "CodeForGood"
+    user = user_data.find_one({"googleId": id})
+    if user:
+        # Convert ObjectId to string
+        user['_id'] = str(user['_id'])
+        return jsonify({"message": "User found", "user": user})
+    else:
+        return jsonify({"message": "User not found"})
 
 # API Route to create users
 @app.route('/write/user', methods=['POST'])

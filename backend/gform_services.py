@@ -92,18 +92,36 @@ def registration_form_questions():
         "createItem": {
             "item": {
             "title": (
+                "What is your email address?"
+            ),
+            "questionItem": {
+                "question": {
+                    "required": True,
+                    "textQuestion": {
+                        "paragraph": False
+                    },
+                }
+            },
+        },
+        "location": {"index": 1},
+    }
+    })
+    questions.append({
+        "createItem": {
+            "item": {
+            "title": (
                 "What is your WhatsApp number?"
             ),
             "questionItem": {
                 "question": {
                     "required": True,
                     "textQuestion": {
-                        "paragraph": True
+                        "paragraph": False
                     },
                 }
             },
         },
-        "location": {"index": 1},
+        "location": {"index": 2},
     }
     })
     return {"requests": questions}
@@ -142,7 +160,7 @@ def create_registration_form(new_event):
                     },
                     "updateMask": "description"
                 }
-            }
+            },
         ]
     }
     
