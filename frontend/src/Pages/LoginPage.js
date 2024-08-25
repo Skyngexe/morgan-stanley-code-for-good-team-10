@@ -20,7 +20,8 @@ function LoginPage() {
 
     return (
         <div className="flex flex-col items-center mt-32">
-            <LoginButton buttonText="Login" />
+            <div className="font-bold text-4xl mb-4" style={{ textShadow: '1px 1px 1px yellow' }}>Welcome to The Zubin Foundation</div>
+            <LoginButton buttonText="Sign in with Google" />
             {/* <LogoutButton /> */}
         </div>
     );

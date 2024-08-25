@@ -51,98 +51,110 @@ function CreateAccountPage() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="mt-32 mb-4 p-4 rounded container min-w-[300px] shadow-xl">
+      <div className="mt-32 mb-4 p-4 rounded container w-[600px] shadow-xl">
         <h1>Creating account for {email}</h1>
-        <form className="flex flex-col items-start" onSubmit={handleSubmit}>
-          <label className="flex items-center gap-x-4">
-            Username:{" "}
+        <form
+          className="flex flex-col items-start gap-y-2"
+          onSubmit={handleSubmit}
+        >
+          <label className="w-full flex items-center justify-between gap-x-4">
+            <span className="w-[256px]">Username: </span>
             <input
               type="text"
               name="username"
               value={accountData.username}
               onChange={handleChange}
-              className="border rounded"
+              className="input input-sm input-bordered max-w-xl"
             />
           </label>
-          <label className="flex items-center gap-x-4">
-            Number:{" "}
+          <label className="w-full flex items-center justify-between gap-x-4">
+            <span className="w-[256px]">Number:</span>
             <input
               type="text"
               name="number"
               value={accountData.number}
               onChange={handleChange}
-              className="border rounded"
+              className="input input-sm input-bordered max-w-xl"
             />
           </label>
-          <label className="flex items-center gap-x-4">
-            Role:{" "}
-            <input
-              type="radio"
-              name="role"
-              value="volunteer"
-              checked={accountData.role === "volunteer"}
-              onChange={handleChange}
-            />{" "}
+          <label className="w-full flex items-center justify-between gap-x-4">
+            <span className="w-[256px]">Role:</span>
+            <div className="pt-[5px]">
+              <input
+                type="radio"
+                name="role"
+                value="volunteer"
+                checked={accountData.role === "volunteer"}
+                onChange={handleChange}
+                className="pt-[5px]"
+              />
+            </div>
             Volunteer
-            <input
-              type="radio"
-              name="role"
-              value="participant"
-              checked={accountData.role === "participant"}
-              onChange={handleChange}
-            />{" "}
+            <div className="pt-[5px]">
+              <input
+                type="radio"
+                name="role"
+                value="participant"
+                checked={accountData.role === "participant"}
+                onChange={handleChange}
+              />
+            </div>{" "}
             Participant
           </label>
-          <label className="flex items-center gap-x-4">
-            Ethnicity:{" "}
+          <label className="w-full flex items-center justify-between gap-x-4">
+            <span className="w-[256px]">Ethnicity:</span>
             <input
               type="text"
               name="ethnicity"
               value={accountData.ethnicity}
               onChange={handleChange}
-              className="border rounded"
+              className="input input-sm input-bordered max-w-xl"
             />
           </label>
-          <label className="flex items-center gap-x-4">
-            Gender:{" "}
-            <input
-              type="radio"
-              name="gender"
-              value="male"
-              checked={accountData.gender === "male"}
-              onChange={handleChange}
-            />{" "}
+          <label className="w-full flex items-center justify-between gap-x-4">
+            <span className="w-[256px]">Gender:</span>
+            <div className="pt-[5px]">
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                checked={accountData.gender === "male"}
+                onChange={handleChange}
+              />
+            </div>{" "}
             Male
-            <input
-              type="radio"
-              name="gender"
-              value="female"
-              checked={accountData.gender === "female"}
-              onChange={handleChange}
-            />{" "}
+            <div className="pt-[5px]">
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                checked={accountData.gender === "female"}
+                onChange={handleChange}
+              />
+            </div>{" "}
             Female
           </label>
-          <label className="flex items-center gap-x-4">
-            Age:{" "}
+          <label className="w-full flex items-center justify-between gap-x-4">
+            <span className="w-[256px]">Age:</span>
             <input
               type="number"
               name="age"
               value={accountData.age}
               onChange={handleChange}
-              className="border rounded"
+              className="input input-sm input-bordered max-w-xl"
             />
           </label>
-          <label className="flex items-center gap-x-4">
-            Preferred Language:{" "}
+          <label className="w-full flex items-center justify-between gap-x-4">
+            <span className="w-[256px]">Preferred Language: </span>
             <input
               type="text"
               name="preferred_language"
               value={accountData.preferred_language}
               onChange={handleChange}
-              className="border rounded"
+              className="input input-sm input-bordered max-w-xl"
             />
           </label>
-          <input type="submit" value="Create Account" />
+          <input type="submit" className="btn btn-primary" value="Create Account" />
         </form>
       </div>
       <LoginButton buttonText="Change Account" />
