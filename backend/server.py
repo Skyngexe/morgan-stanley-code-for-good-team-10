@@ -447,8 +447,33 @@ def updateUserDataWithRegisteredEvent(existing_event, user):
             {'googleId': google_id},
             update_query
         )
+        
+def serialize_user(user):
+    # Convert ObjectId to string for serialization
+    user['_id'] = str(user['_id'])
+    return user
 
-def reloadLeaderBoard
+def reloadLeaderBoard():
+    all_users = list(user_data.find({}))
+    for user in all_users:
+        registered_events_count = len(set([event[0] for event in user.get('registered_events', []) if isinstance(event, (list, tuple))]))
+        user_data.update_one(
+            {'_id': user['_id']},
+            {'$set': {'points': registered_events_count}}
+        )
+        
+    serialized_users = [serialize_user(user) for user in all_users]
+    return json.dumps(serialized_users, default=str)
+
+# Assuming you want to return the JSON response in a Flask route
+@app.route('/leaderboard', methods=['GET'])
+def get_leaderboard():
+    leaderboard_data = reloadLeaderBoard()
+    return jsonify(json.loads(leaderboard_data))
+
+
+
+
 def checkIfAlreadyRegisteredEvent(register, formId, email, phone_number):
     check = event_data.find_one({
                             "form_Id": formId,
