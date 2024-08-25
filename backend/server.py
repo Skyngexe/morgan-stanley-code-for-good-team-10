@@ -9,7 +9,7 @@ from oauth2client import client, file, tools
 from flask_cors import CORS
 from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, create_registration_and_feedback_form, extract_time, extract_date
 from bson.objectid import ObjectId
-
+from gridfs import GridFS
 app = Flask(__name__)
 CORS(app)
 
@@ -30,6 +30,7 @@ event_details= event_db['Event Details']
 # user_data = user_db['User Data']
 events_detail_collection = event_db['Event Details']
 feedback_collection = feedback_db['Events Feedback']
+gfs_photo = GridFS(event_db, "photo")
 
 class UserRole(Enum):
     """
@@ -173,6 +174,14 @@ def create_new_event_and_form():
         new_event['registrationURL'] = forms["registrationURL"]
         new_event['feedback_form_Id'] = forms["feedback_form_Id"]
         new_event['feedbackURL'] = forms["feedbackURL"]
+
+        if 'image' in request.files:
+            image_file = request.files['image']
+            new_file_name = "my-image"  # Set your desired filename
+            gfs_file = gfs_photo.new_file(filename=new_file_name)
+            gfs_file.write(image_file.stream)  # Write the image data
+            gfs_file.close()  # Close the file
+            new_event['image_id'] = gfs_file._id
 
         event_details.insert_one(new_event)
         print(new_event)
@@ -426,6 +435,18 @@ def get_gform_feedback(formId):
     for item in feedback:
         item['_id'] = str(item['_id'])
     return jsonify(feedback)
+    
+
+@app.route('/image/<image_id>', methods=['GET'])
+def get_image(image_id):
+    try:
+        gfs_file = gfs_photo.get(image_id)
+        return gfs_file.read(), 200, {
+            'Content-Type': gfs_file.content_type,
+            'Content-Disposition': f'attachment; filename={gfs_file.filename}'
+        }
+    except Exception as e:
+        return jsonify({'error': str(e)}), 404
     
 # save feedback from gform based on formId to Feedback.Event Feedback
 def save_feedback(formId):
