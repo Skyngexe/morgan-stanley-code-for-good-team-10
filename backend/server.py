@@ -14,15 +14,31 @@ from pymongo import MongoClient
 from enum import Enum
 from bson import json_util
 import json
-from apiclient import discovery
+from googleapiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, create_registration_and_feedback_form, extract_time, extract_date
 from bson.objectid import ObjectId
+import datetime
 
 model = RAGModel(data_path='./ai_chatbox/data/event.js')
 
 
+MONGO_URI = "mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+EVENT_DB = "Event"
+USER_DB = 'User'
+FEEDBACK_DB = 'Feedback'
+# Connect to MongoDB
+db_client = MongoClient(MONGO_URI)
+event_db = db_client[EVENT_DB]
+user_db = db_client[USER_DB]
+feedback_db = db_client[FEEDBACK_DB]
+event_data = event_db['Event Data']
+user_data = user_db['User Data']
+event_details= event_db['Event Details']
+# user_data = user_db['User Data']
+events_detail_collection = event_db['Event Details']
+feedback_collection = feedback_db['Events Feedback']
 
 # Load environment variables
 load_dotenv()
@@ -107,8 +123,6 @@ def format_timedelta(delta):
 
 
 
-
-
 def get_event_details(event_id):
     
     try:
@@ -175,25 +189,6 @@ def send_whatsapp_message(chat_id, message, image_url=None, file_name=None, file
         print(f"Error sending message: {e}")
 
 
-CORS(app)
-
-from datetime import datetime
-
-MONGO_URI = "mongodb+srv://codeforgood2024team10:DevL8aYJXQsTm9@cluster0.acjuj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-EVENT_DB = "Event"
-USER_DB = 'User'
-FEEDBACK_DB = 'Feedback'
-# Connect to MongoDB
-db_client = MongoClient(MONGO_URI)
-event_db = db_client[EVENT_DB]
-user_db = db_client[USER_DB]
-feedback_db = db_client[FEEDBACK_DB]
-event_data = event_db['Event Data']
-user_data = user_db['User Data']
-event_details= event_db['Event Details']
-# user_data = user_db['User Data']
-events_detail_collection = event_db['Event Details']
-feedback_collection = feedback_db['Events Feedback']
 
 class UserRole(Enum):
     """
@@ -667,8 +662,8 @@ def get_events():
 def create_new_event_and_form():
     try:
         new_event = request.json  # Access JSON data from the request object
-        new_event["startDate"]= datetime.strptime(new_event["startDate"], "%Y-%m-%dT%H:%M") 
-        new_event["endDate"]= datetime.strptime(new_event["endDate"], "%Y-%m-%dT%H:%M") 
+        new_event["startDate"]= datetime.datetime.strptime(new_event["startDate"], "%Y-%m-%dT%H:%M") 
+        new_event["endDate"]= datetime.datetime.strptime(new_event["endDate"], "%Y-%m-%dT%H:%M") 
         forms = create_registration_and_feedback_form(new_event)
         new_event['form_Id'] = forms["form_Id"]
         new_event['registrationURL'] = forms["registrationURL"]
@@ -676,8 +671,15 @@ def create_new_event_and_form():
         new_event['feedbackURL'] = forms["feedbackURL"]
 
         event_details.insert_one(new_event)
-        print(new_event)
-        event_data.insert_one(new_event)
+        result = event_data.insert_one(new_event)
+        
+        event_id = result.inserted_id
+        latitude = 114.20863803595589
+        longitude = 22.429999423293598
+        address = new_event.get("location")
+        name_location = new_event.get("location")
+        chat_id = "+853 6283 1088"
+        send_location_message(event_id, latitude, longitude, address, name_location, chat_id)
         
         return jsonify({'message': 'Event data inserted successfully'}), 200
     except Exception as e:
@@ -685,7 +687,7 @@ def create_new_event_and_form():
 
 # 6. Return All Events Details
 @app.route('/eventdetails', methods=['GET'])
-def get_event_details():
+def get_all_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
 
@@ -694,8 +696,8 @@ def get_event_details():
 @app.route('/update/event/<event_id>', methods=['PUT'])
 def update_event_with_id(event_id):
     update_data = request.json
-    update_data["startDate"]= datetime.strptime(update_data["startDate"], "%Y-%m-%dT%H:%M") 
-    update_data["endDate"]= datetime.strptime(update_data["endDate"], "%Y-%m-%dT%H:%M") 
+    update_data["startDate"]= datetime.datetime.strptime(update_data["startDate"], "%Y-%m-%dT%H:%M") 
+    update_data["endDate"]= datetime.datetime.strptime(update_data["endDate"], "%Y-%m-%dT%H:%M") 
     if '_id' in update_data:
         del update_data['_id']  # Remove _id from update_data to avoid modifying the immutable field
     event_object_id = ObjectId(event_id)
