@@ -80,7 +80,7 @@ function App() {
               path="view-feedbacks"
               element={
                 <>
-                  <FeedbackTitle />
+                  {/* <FeedbackTitle /> */}
                   <FeedbackContainer />
                 </>
               }

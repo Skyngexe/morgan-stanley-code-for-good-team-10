@@ -1,163 +1,98 @@
-import { useState } from "react";
-import styles from "../styles/view-events-and-feedbacks.module.css"
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import { Container, Card, CardContent, Typography, Button, Grid } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles({
+  feedbackButton: {
+    backgroundColor: '#f7f779', // light yellow background
+    color: '#000000', // black text
+    '&:hover': {
+      backgroundColor: 'lightyellow'
+    }
+  },
+  cardGrid: {
+    maxWidth: 360,
+    flexGrow: 1
+  }
+});
 
 function FeedbackContainer() {
-  const feedbackList = [
-    {
-      "Event Name": "Tung Chung Chai Gathering - Art with Tissue",
-      Feedbacks: [
-        {
-          "How would you rate 'Tung Chung Chai Gathering - Art with Tissue' from 1 to 10?":
-            "10",
-        },
-        {
-          "What suggestions do you have for improvement":
-            "The event was great, no suggestions for improvement.",
-        },
-      ],
-    },
-    {
-      "Event Name": "Tung Chung Chai Gathering - Art with Tissue",
-      Feedbacks: [
-        {
-          "How would you rate 'Tung Chung Chai Gathering - Art with Tissue' from 1 to 10?":
-            "5",
-        },
-        {
-          "What suggestions do you have for improvement":
-            "It would be helpful to have more interactive sessions.",
-        },
-      ],
-    },
-    {
-      "Event Name": "SEN Centre Help",
-      Feedbacks: [
-        {
-          "How would you rate 'SEN Centre Help' from 1 to 10?": "8",
-        },
-        {
-          "What suggestions do you have for improvement":
-            "Adding more volunteers could enhance the assistance provided.",
-        },
-      ],
-    },
-    {
-      "Event Name":
-        "Weekly Elderly Gathering - Quick and Easy Photos on Your Smartphone",
-      Feedbacks: [
-        {
-          "How would you rate 'Weekly Elderly Gathering - Quick and Easy Photos on Your Smartphone' from 1 to 10?":
-            "9",
-        },
-        {
-          "What suggestions do you have for improvement":
-            "Including a brief photography tutorial could be beneficial.",
-        },
-      ],
-    },
-    {
-      "Event Name": "Chai Gathering for EM Ladies - Potluck Party",
-      Feedbacks: [
-        {
-          "How would you rate 'Chai Gathering for EM Ladies - Potluck Party' from 1 to 10?":
-            "7",
-        },
-        {
-          "What suggestions do you have for improvement":
-            "Having a wider variety of dishes could make the potluck more exciting.",
-        },
-      ],
-    },
-  ];
-  const [eventList, setEventList] = useState([
-    {
-      ID: "A1",
-      Name: "Tung Chung Chai Gathering - Art with Tissue",
-      Location: "City Game",
-      "Start Date": "20 August 2024, 10 PM",
-      "End Date": "20 August 2024, 11PM",
-      "Event Type": "Women",
-      Status: "Available",
-    },
-    {
-      ID: "A2",
-      Name: "SEN Centre Help",
-      Location: "Hong Kong",
-      "Start Date": "10 August 2024",
-      "End Date": "27 December 2024",
-      "Event Type": "Children",
-      Status: "Available",
-    },
-    {
-      ID: "A3",
-      Name: "Chai Gathering for EM Ladies - Potluck Party",
-      Location: "Zubin's Family Centre",
-      "Start Date": "23 August 2024, 10AM",
-      "End Date": "23 August",
-      "Event Type": "Children",
-      Status: "Available",
-    },
-    {
-      ID: "A4",
-      Name: "Tung Chung Chai Gathering - Art with Tissue",
-      Location: "City Game",
-      "Start Date": "20 August 2024, 10 PM",
-      "End Date": "20 August 2024, 11PM",
-      "Event Type": "Women",
-      Status: "Available",
-    },
-    {
-      ID: "A5",
-      Name: "SEN Centre Help",
-      Location: "Hong Kong",
-      "Start Date": "10 August 2024",
-      "End Date": "27 December 2024",
-      "Event Type": "Children",
-      Status: "Available",
-    },
-    {
-      ID: "A6",
-      Name: "Chai Gathering for EM Ladies - Potluck Party",
-      Location: "Zubin's Family Centre",
-      "Start Date": "23 August 2024, 10AM",
-      "End Date": "23 August",
-      "Event Type": "Children",
-      Status: "Available",
-    },
-  ]);
 
-  const handleShowFeedback = () => {
-    console.log("Feedbacks...");
+  const [pastEventsList, setPastEventsList] = useState([]);
+  const [feedbackData, setFeedbackData] = useState([]);
+  const classes = useStyles();
+  
+  const fetchData = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/read/events');
+      const events = response.data;
+      const today = new Date();
+      const pastEvents = events.filter(event => new Date(event.endDate) < today);
+
+      setPastEventsList(pastEvents);
+      console.log("Past events:", pastEvents);
+      console.log("events:", events);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const fetchFeedback = async (formId) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:5000/form/question_and_responses/${formId}`);
+      setFeedbackData(response.data);
+      console.log("Feedback data:", response.data);
+
+    } catch (error) {
+      console.error("Error fetching feedback data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const getOnlyDate = (endDate) => {
+    return endDate ? endDate.slice(0, 10) : "";
   };
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className={styles.container}>
-        {eventList.length > 0 ? (
-          eventList.map((event) => (
-            <div key={event.ID} className={styles.container_items}>
-              <h3>{event.Name}</h3>
-              <div className={styles.info_container}>
-                <div>Location: {event.Location}</div>
-                <div>Start Date: {event["Start Date"]}</div>
-                <div>End Date: {event["End Date"]}</div>
-                <div>Type: {event["Event Type"]}</div>
-              </div>
-              <div className={styles.button_container}>
-                <button
-                  className={styles.event_button}
-                  onClick={() => handleShowFeedback(event.ID)}
+    <Container className="mt-8">
+      <div className="text-3xl font-bold mb-4 pt-20">
+        Event Feedback
+      </div>
+      <Grid container spacing={3} justifyContent="center">
+        {pastEventsList.map(event => (
+          <Grid item key={event.ID} xs={12} sm={6} md={4} className={classes.cardGrid}>
+            <Card variant="outlined" className="hover:shadow-lg transition-shadow">
+              <CardContent>
+                <Typography variant="body1" gutterBottom>
+                  {event.name}
+                </Typography>
+                <Typography color="textSecondary">
+                  Location: {event.location}
+                </Typography>
+                <Typography color="textSecondary">
+                  Event Date: {getOnlyDate(event.endDate.$date)}
+                </Typography>
+                <Typography color="textSecondary">
+                  Type: {event.eventType}
+                </Typography>
+                <Button
+                  size="small"
+                  className={classes.feedbackButton}
+                  onClick={() => fetchFeedback(event.feedback_form_id)}
+                  style={{ marginTop: '16px' }}
                 >
                   Show Feedback
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No Events</p>
-        )}
-      </div>
-    </div>
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
 }
 
