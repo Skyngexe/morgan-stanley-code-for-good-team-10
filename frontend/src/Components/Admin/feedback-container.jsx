@@ -19,7 +19,7 @@ const useStyles = makeStyles({
 
 function FeedbackContainer() {
   const [pastEventsList, setPastEventsList] = useState([]);
-  const [feedbackData, setFeedbackData] = useState([]);
+  const [feedbackData, setFeedbackData] = useState({ responses: { responses: [] } });
   const [dialogOpen, setDialogOpen] = useState(false);
   const classes = useStyles();
   
@@ -79,11 +79,14 @@ function FeedbackContainer() {
   };
 
   const renderDialog = () => {
+    if (!feedbackData.responses || !feedbackData.responses.responses) {
+      return null; // or some loading indicator
+    }
+  
     const answersByQuestion = aggregateAnswersByQuestion(feedbackData.responses.responses);
   
     return (
       <Dialog open={dialogOpen} onClose={handleClose} aria-labelledby="feedback-dialog-title" maxWidth="md" fullWidth>
-        
         <Container className="mb-2 bg-yellow rounded-t-lg">
           <DialogTitle id="feedback-dialog-title" style={{fontWeight: 'bold'}}>
             Feedback Details
@@ -93,7 +96,7 @@ function FeedbackContainer() {
           {Object.entries(answersByQuestion).map(([questionId, answers]) => (
             <div key={questionId} className="mb-5">
               <Typography variant="h6" className="border-b border-gray-300 pb-2" style={{fontWeight: 'bold'}}>
-                {feedbackData.questions[questionId]}
+                {feedbackData.questions && feedbackData.questions[questionId]}
               </Typography>
               <div className="max-h-36 overflow-y-auto mt-2">
                 {answers.map((answer, index) => (
@@ -113,7 +116,7 @@ function FeedbackContainer() {
   };
 
   return (
-    <Container className="mt-8">
+    <Container className="m-8">
       <div className="text-3xl font-bold mb-4 pt-20">Event Feedback</div>
       <Grid container spacing={3} justifyContent="center">
         {pastEventsList.map(event => (
