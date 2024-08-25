@@ -1,10 +1,12 @@
-import React from 'react';
-import VideoList from '../Components/Dashboard/VideoList';
-import Leaderboard from '../Components/Dashboard/Leaderboard';
-import EventList from '../Components/Dashboard/EventList';
-
+import React from "react";
+import VideoList from "../Components/Dashboard/VideoList";
+import Leaderboard from "../Components/Dashboard/Leaderboard";
+import EventList from "../Components/Dashboard/EventList";
+import useStore from "../Components/secureStore";
 
 function Dashboard() {
+  const role = useStore((state) => state.role);
+  console.log("role:", role);
   return (
     <div className="bg-blue-50 min-h-screen flex items-center justify-center">
       <div className="container mx-auto px-4 py-32 sm:px-6 lg:px-8">
@@ -28,7 +30,8 @@ function Dashboard() {
           </div>
           <div>
             <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-              <EventList />
+              {(role == "volunteer") && <VideoList />}
+              {(role == "participant") && <EventList />}
             </div>
           </div>
         </div>

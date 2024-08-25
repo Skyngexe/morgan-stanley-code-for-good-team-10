@@ -11,15 +11,38 @@ const EventList = () => {
     fetchData();
   }, []);
 
+  // const fetchData = async () => {
+  //   try {
+  //     const events = mockEventData;
+  //     console.log(events);
+  //     setEventList(events);
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
   const fetchData = async () => {
     try {
-      const events = mockEventData;
-      console.log(events);
+      const response = await axios.get("http://127.0.0.1:5000/read/events");
+      const events = response.data;
+      const today = new Date();
+
+      const upcomingEvents = events
+        .filter((event) => new Date(event.endDate) > today)
+        .sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+      const pastEvents = events.filter(
+        (event) => new Date(event.endDate) < today
+      );
+
       setEventList(events);
+      console.log("eventList:", eventList);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div>

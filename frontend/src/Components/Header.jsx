@@ -40,15 +40,15 @@ function Header() {
             </Link>
           </li>
           <li>
-            <a
-              href="/dashboard"
+            <Link
+              to="/dashboard"
               className={`px-4 py-2 rounded-md text-lg ${
                 activeLink === "/dashboard" ? "text-red" : "text-darkgrey"
               } hover:text-blue transition duration-150 ease-in-out`}
               onClick={() => handleClick("/dashboard")}
             >
               Dashboard
-            </a>
+            </Link>
           </li>
           <li>
             <Link
