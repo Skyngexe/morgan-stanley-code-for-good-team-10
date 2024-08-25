@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import AdminPage from "./Pages/AdminPage";
 import Header from "./Components/Header";
 import EventPage from "./Pages/EventPage";
+import ChatBot from "./Components/Chatbot/ChatBot";
 import LoginPage from "./Pages/LoginPage";
 import CreateAccountPage from "./Pages/CreateAccountPage";
 import ProfilePage from "./Pages/ProfilePage";
@@ -59,6 +60,7 @@ function App() {
       <div className="App">
         <Header />
         <Routes>
+          <Route path="/chatbot" element={<ChatBot />} />
           <Route path="" element={<EventPage />} />
           <Route path="events" element={<EventPage />} />
           <Route path="dashboard" element={<p>Dashboard Page</p>} />
