@@ -45,6 +45,7 @@ function App() {
     return <div>Loading...</div>;
   }
 
+  console.log(data.message);
   if (data.message === "User not found") {
     return <CreateAccountPage />;
   } else if (data.message !== "User found") {

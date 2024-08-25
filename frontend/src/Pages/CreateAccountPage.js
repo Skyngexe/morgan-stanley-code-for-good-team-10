@@ -14,6 +14,7 @@ function CreateAccountPage() {
     ethnicity: "",
     gender: "",
     age: "",
+    preferred_language: "",
     points: 0,
     googleId: googleId,
   });
@@ -38,7 +39,7 @@ function CreateAccountPage() {
           },
         }
       );
-      // alert(response.data.message);
+      alert(response.data.message);
       window.location.reload();
     } catch (error) {
       alert(error.response.data.error);
