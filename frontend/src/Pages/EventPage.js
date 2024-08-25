@@ -6,7 +6,15 @@ import TimerCountdown from '../Components/Events/TimerCountdown';
 import RSVPForm from '../Components/Events/RsvpForm';
 import EventGallery from '../Components/Events/EventGallery';
 
+import Chatbot from '../Components/Chatbot/ChatBot';
+
 function EventPage() {
+  const [showChatbot, setShowChatbot] = useState(false);
+
+  const toggleChatbot = () => {
+    setShowChatbot(!showChatbot);
+  };
+  
   return (
     <div className="mt-32 p-4">
       <Carousel />
@@ -27,6 +35,23 @@ function EventPage() {
         <RSVPForm />
         <hr className="mb-6"/>
       </div>
+
+      {/* Chatbot Button */}
+      <div className="fixed bottom-4 right-4">
+        <button
+          className="w-16 h-16 bg-blue-500 text-white rounded-full shadow-lg flex items-center justify-center"
+          onClick={toggleChatbot}
+        >
+          💬
+        </button>
+      </div>
+
+      {/* Chatbot Component */}
+      {showChatbot && (
+        <div className="fixed bottom-20 right-4">
+          <Chatbot />
+        </div>
+      )}
     </div>
   );
 }
