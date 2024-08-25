@@ -7,7 +7,7 @@ from apiclient import discovery
 from httplib2 import Http
 from oauth2client import client, file, tools
 from flask_cors import CORS
-from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, create_registration_and_feedback_form
+from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, create_registration_and_feedback_form, extract_time, extract_date
 from bson.objectid import ObjectId
 
 app = Flask(__name__)
@@ -193,6 +193,8 @@ def get_event_details():
 @app.route('/update/event/<event_id>', methods=['PUT'])
 def update_event_with_id(event_id):
     update_data = request.json
+    update_data["startDate"]= datetime.strptime(update_data["startDate"], "%Y-%m-%dT%H:%M") 
+    update_data["endDate"]= datetime.strptime(update_data["endDate"], "%Y-%m-%dT%H:%M") 
     if '_id' in update_data:
         del update_data['_id']  # Remove _id from update_data to avoid modifying the immutable field
     event_object_id = ObjectId(event_id)
@@ -205,9 +207,73 @@ def update_event_with_id(event_id):
         return jsonify({"error": "Event not found"}), 404
     if result.modified_count == 0:
         return jsonify({"message": "No changes made to the event"}), 200
+    update_forms(event_object_id)
     return jsonify({"message": "Event updated successfully"}), 200
     
+def update_forms(event_id):
+    # Find the event in the database
+    event = event_data.find_one({"_id": event_id})
+    if not event:
+        return {"error": "Event not found"}, 404
+
+    # Extract form_Id and feedback_form_Id
+    form_id = event.get("form_Id")
+    feedback_form_id = event.get("feedback_form_Id")
+
+    if not form_id or not feedback_form_id:
+        return {"error": "Form IDs not found in the event data"}, 400
     
+    # Initialize the Google Forms API service
+    API_SCOPES = "https://www.googleapis.com/auth/forms.body"
+    DISCOVERY_DOC = "https://forms.googleapis.com/$discovery/rest?version=v1"
+    store = file.Storage("token.json")
+    creds = None
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets("credentials.json", API_SCOPES)
+        creds = tools.run_flow(flow, store)
+    form_service = discovery.build(
+        "forms",
+        "v1",
+        http=creds.authorize(Http()),
+        discoveryServiceUrl=DISCOVERY_DOC,
+        static_discovery=False,
+    )
+
+    registration_update_body = {
+        "requests": [
+            {
+                "updateFormInfo": {
+                    "info": {
+                        "title": f"{event['name']} Registration Form",
+                        "description": f"Description: {event['descriptions']}\nLocation: {event['location']}\nDate: {event['startDate']} - {event['endDate']}\nVolunteers needed: {event['volunteer_Quota']}\nParticipants needed: {event['participant_Quota']}\n Please use the email you signed up with for your Zubin account"
+                    },
+                    "updateMask": "title,description"
+                }
+            },
+        ]
+    }
+    form_service.forms().batchUpdate(formId=form_id, body=registration_update_body).execute()
+
+    event_start_time = extract_time(event['startDate'])
+    event_end_time = extract_time(event['endDate'])
+    event_date = extract_date(event['startDate'])
+    feedback_update_body = {
+        "requests": [
+            {
+                "updateFormInfo": {
+                    "info": {
+                        "title": f"Feedback form on {event['name']} that is hosted on {event_date} from {event_start_time} to {event_end_time}"
+                    },
+                    "updateMask": "title"
+                }
+            },
+        ]
+    }
+    form_service.forms().batchUpdate(formId=feedback_form_id, body=feedback_update_body).execute()
+
+    return {"message": "Forms updated successfully"}, 200
+    
+
 # 8. Delete Single Event with Event ID
 @app.route('/delete/event/<event_id>', methods=['DELETE'])
 def delete_event_with_id(event_id):
