@@ -8,6 +8,7 @@ from httplib2 import Http
 from oauth2client import client, file, tools
 from flask_cors import CORS
 from gform_services import get_responses_with_formId, get_form_with_formId, get_form_and_resposes, registration_form_questions, create_registration_form, transform_event_data_to_feedback_questions
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 CORS(app)
@@ -167,7 +168,37 @@ def get_event_details():
     events = list(events_detail_collection.find({}, {'_id': 0})) 
     return jsonify(events)
 
-# 6. Update Event
+# 6. Update Single Event Information with Event ID
+@app.route('/update/event/<event_id>', methods=['PUT'])
+def update_event_with_id(event_id):
+    update_data = request.json
+    event_object_id = ObjectId(event_id)
+    result = event_data.update_one(
+        {"_id": event_object_id},
+        {"$set": update_data}
+    )
+    # Check if the update was successful
+    if result.matched_count == 0:
+        return jsonify({"error": "Event not found"}), 404
+    if result.modified_count == 0:
+        return jsonify({"message": "No changes made to the event"}), 200
+    return jsonify({"message": "Event updated successfully"}), 200
+    
+# 7. Delete Single Event Information with Event ID
+@app.route('/delete/event/<event_id>', methods=['DELETE'])
+def delete_event_with_id(event_id):
+    try:
+        event_object_id = ObjectId(event_id)
+        result = event_data.delete_one({"_id": event_object_id})
+        # Check if the delete was successful
+        if result.deleted_count == 0:
+            return jsonify({"error": "Event not found"}), 404
+        return jsonify({"message": "Event deleted successfully"}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+# 8. Update Multiple Events with custom Query
 @app.route('/update/event', methods=['PUT'])
 def update_event_data():
     query = request.json.get('query', {})
@@ -227,7 +258,7 @@ def store_event_feedback_link(feedback_url, event_id, gform_id):
     except Exception as e:
         raise ValueError(f"Error fetching event: {str(e)}")
 
-# 7. Create Google Form with Event ID
+# 9. Create Google Form with Event ID
 @app.route('/create/form/<int:event_id>', methods=['POST'])
 def create_gform(event_id):
     SCOPES = "https://www.googleapis.com/auth/forms.body"
@@ -282,27 +313,27 @@ def create_gform(event_id):
     except ValueError as e:
         return {"error": str(e)}, 404 
 
-# 8. Return Google Form with Form ID
+# 10. Return Google Form with Form ID
 @app.route('/form/get/<formId>', methods=['GET'])
 def get_form(formId):
     data = get_form_with_formId(formId)
     print(data)
     return {"data": data}
 
-# 9. Return Google Form Responses with Form ID
+# 11. Return Google Form Responses with Form ID
 @app.route('/response/form/<formId>', methods=['GET'])
 def get_responses(formId):
     data = get_responses_with_formId(formId)
     print(data)
     return {"data": data}
 
-# 10. Return Questions and Responses of a Google Form with Form ID
+# 12. Return Questions and Responses of a Google Form with Form ID
 @app.route('/form/question_and_responses/<formId>', methods=['GET'])
 def get_form_item(formId):
     data = get_form_and_resposes(formId)
     return data
 
-# 11. Save Feedbacks from Google Form and Return Feedbacks with Form ID
+# 13. Save Feedbacks from Google Form and Return Feedbacks with Form ID
 @app.route('/feedback/show/<formId>', methods=['GET'])
 def get_gform_feedback(formId):
     save_feedback(formId)
@@ -372,7 +403,7 @@ def save_feedback(formId):
     except Exception as e:
         return {"error": str(e)}, 500
 
-# 12. Save All Registration Form Responses to Event and User Table
+# 14. Save All Registration Form Responses to Event and User Table
 @app.route('/response/save/regform', methods=['GET'])
 def save_geresponses():
     events = event_data.find({})
@@ -473,7 +504,7 @@ def reloadLeaderBoard():
     serialized_users = [serialize_user(user) for user in all_users]
     return json.dumps(serialized_users, default=str)
 
-# 13. Return Leaderboard 
+# 15. Return Leaderboard 
 @app.route('/leaderboard', methods=['GET'])
 def get_leaderboard():
     leaderboard_data = reloadLeaderBoard()
