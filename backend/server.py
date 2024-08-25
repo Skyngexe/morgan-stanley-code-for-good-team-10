@@ -621,7 +621,10 @@ def updateEventRegisteredDetails(register, formId, email, phone_number):
                     register: {
                         "email": email,
                         "phone_number": phone_number
-                    }
+                    },
+                    "$set": {
+                        "num_of_f" + register: {"$size": "$register"}
+                    }   
                 }
             }
         )
