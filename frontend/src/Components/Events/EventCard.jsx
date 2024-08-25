@@ -1,61 +1,84 @@
-import React from 'react';
-import { Chip, Box, Grid, Typography, Card, CardMedia, CardContent, Stack } from '@mui/material';
-import EventDetailDialog from './EventDetailDIalog';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardMedia, Chip, Grid, Typography, Stack } from '@mui/material';
+import axios from 'axios';
+import EventDetailDialog from './EventDetailDialog';
 
 function EventCard({ event }) {
-    const [openDialog, setOpenDialog] = React.useState(false);
-
-    function getOnlyDate(endDate) {
-        if (endDate) {
-            // Split the string at the comma and return the first part
-            return endDate.slice(0, 11);
-        }
-        return ""; // Return an empty string if endDate is undefined or null
-    }
-
-    function handleOpenDialog() {
+    const [openDialog, setOpenDialog] = useState(false);
+    const [eventDetails, setEventDetails] = useState(null);
+    
+    const handleOpenDialog = () => {
         setOpenDialog(true);
-    }
+    };
     
-    function handleCloseDialog() {
+    const handleCloseDialog = () => {
         setOpenDialog(false);
-    }
+    };
+
+    const getOnlyDate = (endDate) => {
+        return endDate ? endDate.slice(0, 11) : "";
+    };
+
+    const fetchData = async () => {
+        try {
+          const response = await axios.get('http://127.0.0.1:5000/eventdetails');
+          const events = response.data;
+
+          setEventDetails(events);
+          console.log("Event Deatils: ", events);
+
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
     
+      useEffect(() => {
+        fetchData();
+      }, []);
 
     return (
-        <Card className="max-w-s p-4 bg-white rounded-lg shadow-lg" onClick={handleOpenDialog}>
-        <CardContent>
-            <Grid container spacing={2}>
-            <Grid item xs={12}>
-                <CardMedia
-                component="img"
-                alt={event.title}
-                height="180"
-                image={event.imageURL}
-                title={event.name}
-                className="rounded-lg"
-                />
-            </Grid>
-            <Grid item xs={12} container justify="space-between" alignItems="center" >
-                <Stack direction="row" spacing={1}>
-                    <Chip label={event.location} />
-                    <Chip label={getOnlyDate(event.endDate)} />
-                </Stack>
-            </Grid>
-            <Grid item xs={12}>
-                <Typography variant="h6" component="h2" className="line-clamp-2">
-                {event.name}
-                </Typography>
-            </Grid>
-            <Grid item xs={12}>
-                <Typography variant="body2" color="textSecondary" className="line-clamp-3">
-                {event.descriptions}
-                </Typography>
-            </Grid>
-            </Grid>
-        </CardContent>
-        <EventDetailDialog open={openDialog} onClose={handleCloseDialog} event={event} />
-        </Card>
+        <>
+            <Card 
+                className="max-w-s p-4 bg-white rounded-lg shadow-lg cursor-pointer" 
+                onClick={handleOpenDialog}
+            >
+                <CardContent>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <CardMedia
+                                component="img"
+                                alt={event.title}
+                                height="180"
+                                image={event.imageURL}
+                                title={event.name}
+                                className="rounded-lg"
+                            />
+                        </Grid>
+                        <Grid item xs={12} container justifyContent="space-between" alignItems="center">
+                            <Stack direction="row" spacing={1}>
+                                <Chip label={event.location} />
+                                <Chip label={getOnlyDate(event.endDate)} />
+                            </Stack>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="h6" component="h2">
+                                {event.name}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="body2" color="textSecondary">
+                                {event.descriptions}
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
+            <EventDetailDialog 
+                open={openDialog} 
+                onClose={handleCloseDialog} 
+                events={eventDetails} 
+            />
+        </>
     );
 }
 
