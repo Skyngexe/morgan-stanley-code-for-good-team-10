@@ -69,8 +69,8 @@ events = [
         "location": "Central Park, Hong Kong",
         "category": "Women",
         "description": "A community cleanup event to help clean up the local park.",
-        "registered_participants": ["john_doe"],
-        "attended_participants": ["john_doe"],
+        "registered_participants": ["John Doe"],
+        "attended_participants": ["John Doe"],
         "feedback_collected": True
     },
     {
@@ -79,8 +79,8 @@ events = [
         "location": "Victoria Park, Hong Kong",
         "category": "Children",
         "description": "A charity run to raise funds for local causes.",
-        "registered_participants": ["jane_smith"],
-        "attended_participants": ["jane_smith"],
+        "registered_participants": ["Jane Smith"],
+        "attended_participants": ["Jane Smith"],
         "feedback_collected": True
     },
     {
@@ -89,7 +89,7 @@ events = [
         "location": "Hong Kong Science Park",
         "category": "Climate",
         "description": "A workshop on the latest technologies and innovations.",
-        "registered_participants": ["john_doe", "alice_johnson"],
+        "registered_participants": ["John Doe", "Alice Johnson"],
         "attended_participants": [],
         "feedback_collected": False
     }
