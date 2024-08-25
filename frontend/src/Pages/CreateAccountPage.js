@@ -17,6 +17,8 @@ function CreateAccountPage() {
     preferred_language: "",
     points: 0,
     googleId: googleId,
+    registered_events: [],
+    attended_events: [],
   });
 
   const handleChange = (e) => {
