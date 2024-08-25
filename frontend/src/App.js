@@ -51,10 +51,10 @@ function App() {
       <div className="App">
         <Header />
         <Routes>
-          <Route path="/" element={<EventPage />} />
-          <Route path="/events" element={<EventPage />} />
-          <Route path="/dashboard" element={<p>Dashboard Page</p>} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="" element={<EventPage />} />
+          <Route path="events" element={<EventPage />} />
+          <Route path="dashboard" element={<p>Dashboard Page</p>} />
+          <Route path="admin" element={<AdminPage />} />
         </Routes>
       </div>
     </Router>
