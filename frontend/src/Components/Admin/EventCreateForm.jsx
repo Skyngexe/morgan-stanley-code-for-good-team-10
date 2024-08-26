@@ -6,6 +6,22 @@ const EventCreateForm = ({ data }) => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+    if (files) {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          [name]: reader.result,
+        });
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
     setFormData({
       ...formData,
       [name]: files ? files[0] : value,
