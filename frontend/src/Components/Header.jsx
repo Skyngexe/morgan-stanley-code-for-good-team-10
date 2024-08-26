@@ -4,6 +4,8 @@ import useStore from "./secureStore";
 import { Link } from "react-router-dom";
 
 function Header() {
+  const role = useStore((state) => state.role);
+
   const imageUrl = useStore((state) => state.imageUrl);
 
   const [activeLink, setActiveLink] = useState("");
@@ -50,17 +52,20 @@ function Header() {
               Dashboard
             </Link>
           </li>
-          <li>
-            <Link
-              to="/admin"
-              className={`px-4 py-2 rounded-md text-lg ${
-                activeLink === "/admin" ? "text-red" : "text-darkgrey"
-              } hover:text-blue transition duration-150 ease-in-out`}
-              onClick={() => handleClick("/admin")}
-            >
-              Admin
-            </Link>
-          </li>
+          {role === "admin" && (
+            <li>
+              <Link
+                to="/admin"
+                className={`px-4 py-2 rounded-md text-lg ${
+                  activeLink === "/admin" ? "text-red" : "text-darkgrey"
+                } hover:text-blue transition duration-150 ease-in-out`}
+                onClick={() => handleClick("/admin")}
+              >
+                Admin
+              </Link>
+            </li>
+          )}
+
           <li>
             <Link
               to="/profile"

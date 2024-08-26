@@ -130,13 +130,13 @@ function Container() {
               </div>
               <div className={styles.button_container}>
                 <button
-                  className={styles.event_button}
+                  className={styles.event_button + " btn"}
                   onClick={() => handleUpdate(event)}
                 >
                   Update Event
                 </button>
                 <button
-                  className={styles.event_button}
+                  className={styles.event_button + " btn"}
                   onClick={() => handleDelete(event)}
                 >
                   Delete Event
