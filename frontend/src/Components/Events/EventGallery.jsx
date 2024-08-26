@@ -11,19 +11,19 @@ function EventGallery() {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/read/event");
+      const response = await axios.get("http://127.0.0.1:5000/read/events");
       const events = response.data;
+      console.log("events:", response.data);
       const today = new Date();
 
       const upcomingEvents = events
-        .filter((event) => new Date(event.endDate.$date) > today)
+        .filter((event) => new Date(event.endDate) > today)
         .sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
       const pastEvents = events.filter(
-        (event) => new Date(event.endDate.$date) < today
+        (event) => new Date(event.endDate) < today
       );
 
       setEventDataList(events);
-      console.log("eventDataList:", eventDataList);
       setUpcomingEventsList(upcomingEvents);
       setPastEventsList(pastEvents);
     } catch (error) {
