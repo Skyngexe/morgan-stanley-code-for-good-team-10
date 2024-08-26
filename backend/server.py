@@ -678,7 +678,7 @@ def create_new_event_and_form():
         longitude = 22.429999423293598
         address = new_event.get("location")
         name_location = new_event.get("location")
-        chat_id = "+853 6283 1088"
+        chat_id = "85362831088@c.us"
         send_location_message(event_id, latitude, longitude, address, name_location, chat_id)
         
         return jsonify({'message': 'Event data inserted successfully'}), 200
